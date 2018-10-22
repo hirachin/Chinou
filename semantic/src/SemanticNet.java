@@ -23,35 +23,46 @@ public class SemanticNet {
 	System.out.println((doQuery(theQueries)).toString());
     }
 
-    public ArrayList doQuery(ArrayList theQueries){
-	ArrayList bindingsList = new ArrayList();
-	for(int i = 0 ; i < theQueries.size() ; i++){
-	    Link theQuery = (Link)theQueries.get(i);
-	    ArrayList bindings = queryLink(theQuery);
-	    if(bindings.size() != 0){
-		bindingsList.add(bindings);
-	    } else {
-		//失敗したとき
-		return (new ArrayList());
-	    }
+	public ArrayList doQuery(ArrayList theQueries)
+	{
+		ArrayList bindingsList = new ArrayList();
+		
+		for(int i = 0 ; i < theQueries.size() ; i++)
+		{
+			Link theQuery = (Link)theQueries.get(i);
+			ArrayList bindings = queryLink(theQuery);
+			if(bindings.size() != 0)
+			{
+				bindingsList.add(bindings);
+			} 
+			else 
+			{
+			//失敗したとき
+			return (new ArrayList());
+			}
+		}
+		
+		return join(bindingsList);
 	}
-	return join(bindingsList);
-    }
 
-    public ArrayList queryLink(Link theQuery){
-	ArrayList bindings = new ArrayList();
-	for(int i = 0 ; i < links.size() ; i++){
-	    Link theLink = (Link)links.get(i);
-	    HashMap<String,String> binding = new HashMap<String,String>();
-	    String theQueryString = theQuery.getFullName();
-	    String theLinkString  = theLink.getFullName();
-	    if((new Matcher()).
-	       matching(theQueryString,theLinkString,binding)){
-		bindings.add(binding);
-	    }
+	public ArrayList queryLink(Link theQuery)
+	{
+		ArrayList bindings = new ArrayList();
+		for(int i = 0 ; i < links.size() ; i++)
+		{
+			Link theLink = (Link)links.get(i);
+			HashMap<String,String> binding = new HashMap<String,String>();
+			String theQueryString = theQuery.getFullName();
+			String theLinkString  = theLink.getFullName();
+			
+			if((new Matcher()).matching(theQueryString,theLinkString,binding))
+			{
+				bindings.add(binding);
+			}
+		}
+		
+		return bindings;
 	}
-	return bindings;
-    }
 
     public ArrayList join(ArrayList theBindingsList){
 	int size = theBindingsList.size();
@@ -150,29 +161,30 @@ public class SemanticNet {
      * theInheritLinks : 継承すべきリンク
      * theInheritNodes : 継承すべきリンクを継承するノード
      */
-    public void recursiveInheritance(ArrayList<Link> theInheritLinks,
-				     ArrayList<Node> theInheritNodes){
-	for(int i = 0 ; i < theInheritNodes.size() ; i++){
-	    Node theNode = (Node)theInheritNodes.get(i);
-	    // theNode 自体にリンクを継承．
-	    for(int j = 0 ; j < theInheritLinks.size() ; j++){
-		// theNode を tail にしたリンクを生成
-		Link theLink = (Link)theInheritLinks.get(j);
-		Link newLink = new Link(theLink.getLabel(),
-					theNode.getName(),
-					(theLink.getHead()).getName(),
-					 this);
-		newLink.setInheritance(true);
-		links.add(newLink);
-		theNode.addDepartFromMeLinks(newLink);
-	    }
-	    // theNode から is-a でたどれるノードにリンクを継承
-	    ArrayList<Node> isaTails = theNode.getISATails();
-	    if(isaTails.size() != 0){
-		recursiveInheritance(theInheritLinks,isaTails);
-	    }
+    public void recursiveInheritance(ArrayList<Link> theInheritLinks,ArrayList<Node> theInheritNodes)
+	{
+		for(int i = 0 ; i < theInheritNodes.size() ; i++)
+		{
+			Node theNode = (Node)theInheritNodes.get(i);
+			// theNode 自体にリンクを継承．
+			for(int j = 0 ; j < theInheritLinks.size() ; j++)
+			{
+				// theNode を tail にしたリンクを生成
+				Link theLink = (Link)theInheritLinks.get(j);
+				Link newLink = new Link(theLink.getLabel(),theNode.getName(),(theLink.getHead()).getName(),this);
+				newLink.setInheritance(true);
+				links.add(newLink);
+				theNode.addDepartFromMeLinks(newLink);
+			}
+			
+			// theNode から is-a でたどれるノードにリンクを継承
+			ArrayList<Node> isaTails = theNode.getISATails();
+			if(isaTails.size() != 0)
+			{
+				recursiveInheritance(theInheritLinks,isaTails);
+			}
+		}
 	}
-    }
 
 
     public ArrayList<Node> getNodes(){

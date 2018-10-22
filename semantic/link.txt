@@ -1,0 +1,26 @@
+#野球はスポーツである．
+is-a baseball sports
+
+# 太郎は名古屋工業大学の学生である．
+is-a Taro NIT-student 
+
+# 太郎の専門は人工知能である．
+speciality Taro AI 
+
+# フェラーリは車である．
+is-a Ferrari car 
+
+# 車はエンジンを持つ．
+has-a car engine 
+
+# 太郎の趣味は野球である．
+hobby Taro baseball 
+
+# 太郎はフェラーリを所有する．
+own Taro Ferrari 
+
+# 名古屋工業大学の学生は，学生である．
+is-a NIT-student student 
+
+# 学生は勉強しない．
+donot student study 

@@ -100,9 +100,9 @@ public boolean isInstance() { return mIsInstance; }
  * getSupers
  *  このフレームのスーパーフレームを返す
  */
-public
-Iterator getSupers() {
- return getSlotValues( getSuperSlotName() );
+public Iterator getSupers() 
+{
+	return getSlotValues( getSuperSlotName());
 }
 
 
@@ -121,10 +121,7 @@ Iterator getSupers() {
  */
 public
 Object
-readSlotValue(
- AIFrameSystem inFrameSystem,
- String inSlotName,
- boolean inDefault )
+readSlotValue( AIFrameSystem inFrameSystem,String inSlotName,boolean inDefault )
 {
  return getFirst(
          readSlotValues( inFrameSystem, inSlotName, inDefault ) );
@@ -135,31 +132,38 @@ readSlotValue(
  * readSlotValues
  *  スロット inSlotName に格納されているスロット値を返す．
  */
-public Iterator readSlotValues(
- AIFrameSystem inFrameSystem,
- String inSlotName,
- boolean inDefault )
+public Iterator readSlotValues( AIFrameSystem inFrameSystem, String inSlotName, boolean inDefault )
 {
- Iterator obj = null;
- 
- if ( inDefault == false ) {
-  AISlot slot = getSlot( inSlotName );
-  if ( slot != null )
-   obj = slot.getSlotValues();
- }
-  
- if ( obj == null )
-  obj = readSlotValuesWithWhenRequestedProc(
-         inFrameSystem, inSlotName );
+	Iterator obj = null;
+	
+	if ( inDefault == false ) 
+	{
+		AISlot slot = getSlot( inSlotName );
+		if ( slot != null )
+		{
+			obj = slot.getSlotValues();
+		}
+	}
+	
+	if ( obj == null )
+	{
+		obj = readSlotValuesWithWhenRequestedProc(inFrameSystem, inSlotName );
+	}
 
- if ( obj == null ) {
-  Iterator supers = getSupers();
-  while ( supers.hasNext() == true ) {
-   AIClassFrame frame = (AIClassFrame) supers.next();
-   obj = frame.getSlotValues( inSlotName );
-   if ( obj != null )
-    break;
-  }
+	if ( obj == null ) 
+	{
+		Iterator supers = getSupers();
+		while ( supers.hasNext() == true ) 
+		{
+			AIClassFrame frame = (AIClassFrame) supers.next();
+			obj = frame.getSlotValues( inSlotName );
+
+			if ( obj != null )
+			{
+				break;
+			}
+	}
+	
  }
 
  return readSlotValuesWithWhenReadProc(
@@ -340,16 +344,15 @@ Object getSlotValue( String inSlotName ) {
  return null;
 }
 
-public
-Iterator getSlotValues( String inSlotName ) {
- AISlot slot = getSlot( inSlotName );
- if ( slot == null )
-  return null;
- return slot.getSlotValues();
+public Iterator getSlotValues( String inSlotName ) 
+{
+	AISlot slot = getSlot( inSlotName );
+	if ( slot == null ){return null;}
+	
+	return slot.getSlotValues();
 }
 
-public
-void setSlotValue( String inSlotName, Object inSlotValue ) {
+public void setSlotValue( String inSlotName, Object inSlotValue ) {
  AISlot slot = getSlot( inSlotName );
  if ( slot == null ) {
   slot = new AISlot();
@@ -390,6 +393,10 @@ void setDemonProc(
 }
 
 
+//myend
+
+
+
 // ------------------------------------------------------------------
 // utils
 // ------------------------------------------------------------------
@@ -398,10 +405,16 @@ void setDemonProc(
  * getSuperSlotName
  *  スーパーフレームを格納しているスロットの名前を返す．
  */
-String getSuperSlotName() {
- if ( isInstance() == true )
-  return "is-a";
- return "ako";
+String getSuperSlotName() 
+{
+	if ( isInstance() == true )
+	{
+		System.out.println(mName + " " + "is-a");
+		return "is-a";
+	}
+
+	System.out.println(mName + " " + "ako");
+	return "ako";
 }
 
 /*

@@ -1,6 +1,6 @@
 /*
- AIDemonProc.java
-  すべての種類のデモン手続きのスーパークラス
+	AIDemonProc.java
+	すべての種類のデモン手続きのスーパークラス
 */
 
 import java.util.*;
