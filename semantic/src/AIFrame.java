@@ -119,12 +119,9 @@ public Iterator getSupers()
  *   5. 自分のスロット値
  *   6. スーパークラスのスロット値
  */
-public
-Object
-readSlotValue( AIFrameSystem inFrameSystem,String inSlotName,boolean inDefault )
+public Object readSlotValue( AIFrameSystem inFrameSystem,String inSlotName,boolean inDefault )
 {
- return getFirst(
-         readSlotValues( inFrameSystem, inSlotName, inDefault ) );
+	return getFirst(readSlotValues( inFrameSystem, inSlotName, inDefault ) );
 }
 
 
@@ -166,8 +163,7 @@ public Iterator readSlotValues( AIFrameSystem inFrameSystem, String inSlotName, 
 	
  }
 
- return readSlotValuesWithWhenReadProc(
-         inFrameSystem, inSlotName, obj );
+ return readSlotValuesWithWhenReadProc(inFrameSystem, inSlotName, obj );
 }
 
 
@@ -409,11 +405,9 @@ String getSuperSlotName()
 {
 	if ( isInstance() == true )
 	{
-		System.out.println(mName + " " + "is-a");
 		return "is-a";
 	}
 
-	System.out.println(mName + " " + "ako");
 	return "ako";
 }
 

@@ -56,17 +56,30 @@ public class FrameExample
 		fs.writeSlotValue( "human", "weight_kg", new Double(60.0) );
 		// height と weight から BMI を計算するための式 bmi =  weight/height_m^2を
 		// when-requested demon として bmi スロットに割り当てる
-		fs.setWhenRequestedProc( "human", "bmi", new AIDemonProcBMI() );
+		//fs.setWhenRequestedProc( "human", "bmi", new AIDemonProcBMI() );
+		
+		//クラスフレームclubの生成
+//		fs.createClassFrame("club");
+		
+		//各種clubのインスタンスフレームの作成
+//		fs.createInstanceFrame("club","none");
+//		fs.createInstanceFrame("club","computer");
+//		fs.createInstanceFrame("club","baseball");
+//		fs.createInstanceFrame("club","tennis");
 		
 		//クラスフレームhumanを継承するクラスフレームstudentの生成
 		fs.createClassFrame("human","student");
+		fs.setWhenRequestedProc( "student", "bmi", new AIDemonProcBMI() );
+		fs.writeSlotValue("student","memberOf",new String("none"));
 		
+
 		
 		//インスタンスフレームの作成
 		fs.createInstanceFrame( "student", "hirabayashi" );
 		//インスタンスのデータの設定
 		fs.writeSlotValue( "hirabayashi", "height_cm", new Integer( 200 ) );
 		fs.writeSlotValue( "hirabayashi", "weight_kg", new Double( 100.0 ) );
+		fs.writeSlotValue( "hirabayashi", "memberOf", new String("computer") );
 		
 		
 		
@@ -75,6 +88,7 @@ public class FrameExample
 		System.out.println( fs.readSlotValue( "hirabayashi", "height_cm", false ) );
 		System.out.println( fs.readSlotValue( "hirabayashi", "weight_kg", false ) );
 		System.out.println( fs.readSlotValue( "hirabayashi", "bmi", false ) );
+		System.out.println( fs.readSlotValue( "hirabayashi", "memberOf", false ) );
 		//System.out.println( fs.readSlotValue( "student", "height_cm", false ) );
 		//System.out.println( fs.readSlotValue( "student", "weight_kg", false ) );
 		//System.out.println( fs.readSlotValue( "student", "bmi", false ) );

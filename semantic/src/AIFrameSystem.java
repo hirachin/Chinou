@@ -133,7 +133,6 @@ public class AIFrameSystem
 		return frame.readSlotValue( this, inSlotName, false );
 	}
 
-
 	/**
 	 * readSlotValue 
 	 *  スロット値を返す
@@ -147,7 +146,6 @@ public class AIFrameSystem
 		AIFrame frame = (AIFrame) mFrames.get( inFrameName );
 		return frame.readSlotValue( this, inSlotName, false );
 	}
-
 
 	/**
 	 * writeSlotValue 
@@ -163,18 +161,13 @@ public class AIFrameSystem
 		frame.writeSlotValue( this, inSlotName, inSlotValue );
 	}
 
-
 	// demon procedure の設定
 
 	/**
 	 * setWhenConstructedProc
 	 *  when-constructed procedure を設定する．
 	 */
-	public
-	void setWhenConstructedProc(
-	 String inFrameName,
-	 String inSlotName,
-	 AIWhenConstructedProc inDemonProc )
+	public void setWhenConstructedProc(String inFrameName, String inSlotName, AIWhenConstructedProc inDemonProc)
 	{
 		AIFrame frame = (AIFrame) mFrames.get( inFrameName );
 		if ( frame != null )
@@ -183,11 +176,7 @@ public class AIFrameSystem
 		}
 	}
 
-	public
-	void setWhenConstructedProc(
-	 String inFrameName,
-	 String inSlotName,
-	 String inClassName )
+	public void setWhenConstructedProc(String inFrameName, String inSlotName, String inClassName)
 	{
 		try 
 		{
@@ -209,49 +198,28 @@ public class AIFrameSystem
 	 * setWhenRequestedProc
 	 *  when-requested procedure を設定する．
 	 */
-	public
-	void setWhenRequestedProc(
-	 String inFrameName,
-	 String inSlotName,
-	 AIDemonProc inDemonProc )
+	public void setWhenRequestedProc(String inFrameName, String inSlotName, AIDemonProc inDemonProc)
 	{
-	 setDemonProc( AISlot.WHEN_REQUESTED, inFrameName,
-	  inSlotName, inDemonProc );
+		setDemonProc( AISlot.WHEN_REQUESTED, inFrameName, inSlotName, inDemonProc );
 	}
 
-	public
-	void setWhenRequestedProcClass(
-	 String inFrameName,
-	 String inSlotName,
-	 String inClassName )
+	public void setWhenRequestedProcClass(String inFrameName, String inSlotName, String inClassName)
 	{
-	 setDemonProcClass( AISlot.WHEN_REQUESTED,
-	  inFrameName, inSlotName, inClassName );
+		setDemonProcClass( AISlot.WHEN_REQUESTED, inFrameName, inSlotName, inClassName );
 	}
-
 
 	/**
 	 * setWhenReadProc
 	 *  when-read procedure を設定する．
 	 */
-	public
-	void setWhenReadProc(
-	 String inFrameName,
-	 String inSlotName,
-	 AIDemonProc inDemonProc )
+	public void setWhenReadProc(String inFrameName, String inSlotName, AIDemonProc inDemonProc)
 	{
-	 setDemonProc( AISlot.WHEN_READ,
-	  inFrameName, inSlotName, inDemonProc );
+		setDemonProc( AISlot.WHEN_READ, inFrameName, inSlotName, inDemonProc );
 	}
 
-	public
-	void setWhenReadProcClass(
-	 String inFrameName,
-	 String inSlotName,
-	 String inClassName )
+	public void setWhenReadProcClass(String inFrameName, String inSlotName, String inClassName)
 	{
-	 setDemonProcClass( AISlot.WHEN_READ,
-	  inFrameName, inSlotName, inClassName );
+		setDemonProcClass( AISlot.WHEN_READ, inFrameName, inSlotName, inClassName );
 	}
 
 
