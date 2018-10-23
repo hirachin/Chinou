@@ -40,6 +40,70 @@ public class FrameExample
 	}
 	
 	
+	public static void setCreateFrame(AIFrameSystem _fs)
+	{
+		
+		// クラスフレーム human の生成
+		_fs.createClassFrame("human");
+		
+		// height スロットを設定(単位cm)
+		_fs.writeSlotValue( "human", "height_cm" ,new Integer( 160 ) );
+		// weight スロットを設定(単位kg)
+		_fs.writeSlotValue( "human", "weight_kg", new Double(60.0) );
+		// height と weight から BMI を計算するための式 bmi =  weight/height_m^2を
+		// when-requested demon として bmi スロットに割り当てる
+		_fs.setWhenRequestedProc( "human", "bmi", new AIDemonProcBMI() );
+		
+		
+		//クラスフレームhumanを継承するクラスフレームstudentの生成
+		_fs.createClassFrame("human","student");
+		
+		//bmiについて再定義
+		_fs.setWhenRequestedProc( "student", "bmi", new AIDemonProcBMI() );
+		//所属クラブについて設定
+		_fs.writeSlotValue("student","memberOf",new String("none"));
+		
+		
+		//クラスフレームclubの生成
+		_fs.createClassFrame("club");
+		fs.createInstanceFrame("club","none");
+	}
+	
+	//humanクラスフレームのインスタンスを作成
+	public static void createHumanInstance(AIFrameSystem _fs,String _frameName,int _height_cm,double _weight_kg)
+	{
+		//インスタンスフレームの作成
+		_fs.createInstanceFrame( "human", _frameName);
+		//インスタンスのデータの設定
+		_fs.writeSlotValue(_frameName, "height_cm", new Integer(_height_cm));
+		_fs.writeSlotValue(_frameName, "weight_kg", new Double(_weight_kg));
+	}
+	
+	//stidentクラスフレームのインスタンスを作成
+	public static void createStudentInstance(AIFrameSystem _fs,String _frameName,int _height_cm,double _weight_kg)
+	{
+		//インスタンスフレームの作成
+		_fs.createInstanceFrame( "student", _frameName);
+		//インスタンスのデータの設定
+		_fs.writeSlotValue(_frameName, "height_cm", new Integer(_height_cm));
+		_fs.writeSlotValue(_frameName, "weight_kg", new Double(_weight_kg));
+	}
+	
+	//stidentクラスフレームのインスタンスを作成	
+	public static void createStudentInstance(AIFrameSystem _fs,String _frameName,int _height_cm,double _weight_kg,String _clubName)
+	{
+		createStudentInstance(_fs,_frameName,_height_cm,_weight_kg);
+		//所属クラブについて設定
+		_fs.writeSlotValue(_frameName, "memberOf", new String(_clubName));
+	}
+	
+	public static void createClubInstance(String _clubName)
+	{
+		//各種clubのインスタンスフレームの作成
+		_fs.createInstanceFrame("club","none");
+	}
+
+	
 	public static void main(String args[]) 
 	{
 		System.out.println( "Frame" );
@@ -47,48 +111,46 @@ public class FrameExample
 		// フレームシステムの初期化
 		AIFrameSystem fs = new AIFrameSystem();
 		
-		// クラスフレーム human の生成
-		fs.createClassFrame("human");
-		
-		// height スロットを設定(単位cm)
-		fs.writeSlotValue( "human", "height_cm" ,new Integer( 160 ) );
-		// weight スロットを設定(単位kg)
-		fs.writeSlotValue( "human", "weight_kg", new Double(60.0) );
-		// height と weight から BMI を計算するための式 bmi =  weight/height_m^2を
-		// when-requested demon として bmi スロットに割り当てる
-		//fs.setWhenRequestedProc( "human", "bmi", new AIDemonProcBMI() );
-		
-		//クラスフレームclubの生成
-//		fs.createClassFrame("club");
+		setCreateFrame(fs);
 		
 		//各種clubのインスタンスフレームの作成
-//		fs.createInstanceFrame("club","none");
-//		fs.createInstanceFrame("club","computer");
-//		fs.createInstanceFrame("club","baseball");
-//		fs.createInstanceFrame("club","tennis");
+		fs.createInstanceFrame("club","none");
+		fs.createInstanceFrame("club","computer");
+		fs.createInstanceFrame("club","baseball");
+		fs.createInstanceFrame("club","tennis");
 		
-		//クラスフレームhumanを継承するクラスフレームstudentの生成
-		fs.createClassFrame("human","student");
-		fs.setWhenRequestedProc( "student", "bmi", new AIDemonProcBMI() );
-		fs.writeSlotValue("student","memberOf",new String("none"));
-		
-
-		
-		//インスタンスフレームの作成
-		fs.createInstanceFrame( "student", "hirabayashi" );
-		//インスタンスのデータの設定
-		fs.writeSlotValue( "hirabayashi", "height_cm", new Integer( 200 ) );
-		fs.writeSlotValue( "hirabayashi", "weight_kg", new Double( 100.0 ) );
-		fs.writeSlotValue( "hirabayashi", "memberOf", new String("computer") );
-		
-		
+		createHumanInstance(fs,"kato",180,70);
+		createStudentInstance(fs,"hirabayashi",170,64,"computer");
+		createStudentInstance(fs,"sato",160,80);
 		
 		System.out.println("----------------------------");
-		//データ表示
+		
+		System.out.println( fs.readSlotValue( "kato", "height_cm", false ) );
+		System.out.println( fs.readSlotValue( "kato", "weight_kg", false ) );
+		System.out.println( fs.readSlotValue( "kato", "bmi", false ) );
+		
 		System.out.println( fs.readSlotValue( "hirabayashi", "height_cm", false ) );
 		System.out.println( fs.readSlotValue( "hirabayashi", "weight_kg", false ) );
 		System.out.println( fs.readSlotValue( "hirabayashi", "bmi", false ) );
 		System.out.println( fs.readSlotValue( "hirabayashi", "memberOf", false ) );
+		
+		System.out.println( fs.readSlotValue( "sato", "height_cm", false ) );
+		System.out.println( fs.readSlotValue( "sato", "weight_kg", false ) );
+		System.out.println( fs.readSlotValue( "sato", "bmi", false ) );
+		System.out.println( fs.readSlotValue( "sato", "memberOf", false ) );
+		
+		
+		
+		
+		
+		//データ表示
+		/*
+		System.out.println( fs.readSlotValue( "hirabayashi", "height_cm", false ) );
+		System.out.println( fs.readSlotValue( "hirabayashi", "weight_kg", false ) );
+		System.out.println( fs.readSlotValue( "hirabayashi", "bmi", false ) );
+		System.out.println( fs.readSlotValue( "hirabayashi", "memberOf", false ) );
+		*/
+		
 		//System.out.println( fs.readSlotValue( "student", "height_cm", false ) );
 		//System.out.println( fs.readSlotValue( "student", "weight_kg", false ) );
 		//System.out.println( fs.readSlotValue( "student", "bmi", false ) );
