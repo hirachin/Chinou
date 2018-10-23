@@ -66,41 +66,53 @@ public class FrameExample
 		
 		//クラスフレームclubの生成
 		_fs.createClassFrame("club");
-		fs.createInstanceFrame("club","none");
+		//memberNumスロットを設定
+		_fs.writeSlotValue("club","memberNum",new Integer(0));
+		
+		//クラブに入ってない人用
+		_fs.createInstanceFrame("club","none");
 	}
 	
 	//humanクラスフレームのインスタンスを作成
-	public static void createHumanInstance(AIFrameSystem _fs,String _frameName,int _height_cm,double _weight_kg)
+	public static void createHumanInstance(AIFrameSystem _fs,String _name,int _height_cm,double _weight_kg)
 	{
 		//インスタンスフレームの作成
-		_fs.createInstanceFrame( "human", _frameName);
+		_fs.createInstanceFrame( "human", _name);
 		//インスタンスのデータの設定
-		_fs.writeSlotValue(_frameName, "height_cm", new Integer(_height_cm));
-		_fs.writeSlotValue(_frameName, "weight_kg", new Double(_weight_kg));
+		_fs.writeSlotValue(_name, "height_cm", new Integer(_height_cm));
+		_fs.writeSlotValue(_name, "weight_kg", new Double(_weight_kg));
 	}
 	
 	//stidentクラスフレームのインスタンスを作成
-	public static void createStudentInstance(AIFrameSystem _fs,String _frameName,int _height_cm,double _weight_kg)
+	public static void createStudentInstance(AIFrameSystem _fs,String _name,int _height_cm,double _weight_kg)
 	{
 		//インスタンスフレームの作成
-		_fs.createInstanceFrame( "student", _frameName);
+		_fs.createInstanceFrame( "student", _name);
 		//インスタンスのデータの設定
-		_fs.writeSlotValue(_frameName, "height_cm", new Integer(_height_cm));
-		_fs.writeSlotValue(_frameName, "weight_kg", new Double(_weight_kg));
+		_fs.writeSlotValue(_name, "height_cm", new Integer(_height_cm));
+		_fs.writeSlotValue(_name, "weight_kg", new Double(_weight_kg));
 	}
 	
-	//stidentクラスフレームのインスタンスを作成	
-	public static void createStudentInstance(AIFrameSystem _fs,String _frameName,int _height_cm,double _weight_kg,String _clubName)
+	//stidentクラスフレームのインスタンスを作成
+	public static void createStudentInstance(AIFrameSystem _fs,String _name,int _height_cm,double _weight_kg,String _clubName)
 	{
-		createStudentInstance(_fs,_frameName,_height_cm,_weight_kg);
+		createStudentInstance(_fs,_name,_height_cm,_weight_kg);
 		//所属クラブについて設定
-		_fs.writeSlotValue(_frameName, "memberOf", new String(_clubName));
+		_fs.writeSlotValue(_name, "memberOf", new String(_clubName));
 	}
 	
-	public static void createClubInstance(String _clubName)
+	//_clubクラスフレームのインスタンスを作成
+	public static void createClubInstance(AIFrameSystem _fs,String _clubName)
 	{
-		//各種clubのインスタンスフレームの作成
-		_fs.createInstanceFrame("club","none");
+		//clubのインスタンスフレームの作成
+		_fs.createInstanceFrame("club",_clubName);
+	}
+	
+	//_clubクラスフレームのインスタンスを作成
+	public static void createClubInstance(AIFrameSystem _fs,String _clubName,int _memberNum)
+	{
+		createClubInstance(_fs,_clubName);
+		_fs.writeSlotValue(_clubName, "memberNum", new Integer(_memberNum));
 	}
 
 	
@@ -114,10 +126,9 @@ public class FrameExample
 		setCreateFrame(fs);
 		
 		//各種clubのインスタンスフレームの作成
-		fs.createInstanceFrame("club","none");
-		fs.createInstanceFrame("club","computer");
-		fs.createInstanceFrame("club","baseball");
-		fs.createInstanceFrame("club","tennis");
+		createClubInstance(fs,"computer",40);
+		createClubInstance(fs,"baseball",30);
+		createClubInstance(fs,"tennis",50);
 		
 		createHumanInstance(fs,"kato",180,70);
 		createStudentInstance(fs,"hirabayashi",170,64,"computer");
@@ -140,7 +151,7 @@ public class FrameExample
 		System.out.println( fs.readSlotValue( "sato", "memberOf", false ) );
 		
 		
-		
+		System.out.println(fs.readSlotValue( (String)fs.readSlotValue("hirabayashi","memberOf"), "memberNum"));
 		
 		
 		//データ表示
