@@ -114,6 +114,14 @@ public class FrameExample
 		createClubInstance(_fs,_clubName);
 		_fs.writeSlotValue(_clubName, "memberNum", new Integer(_memberNum));
 	}
+	
+	public static void printHumanInstance(AIFrameSystem _fs,String _name)
+	{
+		System.out.println("名前：" + _name);
+		System.out.println("身長："  + _fs.readSlotValue( _name, "height_cm"));
+		System.out.println("体重："  + _fs.readSlotValue( _name, "weight_kg"));
+		System.out.println(" BMI："  + _fs.readSlotValue( _name, "bmi"));
+	}
 
 	
 	public static void main(String args[]) 
@@ -136,10 +144,11 @@ public class FrameExample
 		
 		System.out.println("----------------------------");
 		
-		System.out.println( fs.readSlotValue( "kato", "height_cm", false ) );
-		System.out.println( fs.readSlotValue( "kato", "weight_kg", false ) );
-		System.out.println( fs.readSlotValue( "kato", "bmi", false ) );
+//		printHumanInstance(fs,"kato");
+		printHumanInstance(fs,"eto");
 		
+		
+		/*
 		System.out.println( fs.readSlotValue( "hirabayashi", "height_cm", false ) );
 		System.out.println( fs.readSlotValue( "hirabayashi", "weight_kg", false ) );
 		System.out.println( fs.readSlotValue( "hirabayashi", "bmi", false ) );
@@ -152,7 +161,7 @@ public class FrameExample
 		
 		
 		System.out.println(fs.readSlotValue( (String)fs.readSlotValue("hirabayashi","memberOf"), "memberNum"));
-		
+		*/
 		
 		//データ表示
 		/*
