@@ -3,6 +3,8 @@
 
 */
 
+import java.io.*;
+
 public class FrameExample 
 {
 	public static void example()
@@ -39,7 +41,62 @@ public class FrameExample
 
 	}
 	
+	//ファイルからインスタンスフレームの情報を読み込む
+	public static void loadFrame(AIFrameSystem _fs,String _path)
+	{
+		try
+		{
+			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(_path), "UTF-8"));
+			
+			String line;
+			
+			while((line = reader.readLine()) != null)
+			{
+				if(line.equals("")){continue;}
+				
+				String[] datas = line.split(" ");
+				
+
+				if(datas[0].equals("human") && datas.length == 4)
+				{
+					createHumanInstance(_fs,datas[1],Integer.parseInt(datas[2]),Double.parseDouble(datas[3]));
+				}
+				
+				else if(datas[0].equals("student"))
+				{
+					if(datas.length == 4)
+					{
+						createStudentInstance(_fs,datas[1],Integer.parseInt(datas[2]),Double.parseDouble(datas[3]));
+					}
+					
+					else if(datas.length == 5)
+					{
+						createStudentInstance(_fs,datas[1],Integer.parseInt(datas[2]),Double.parseDouble(datas[3]),datas[4]);
+					}
+				}
+				
+				else if(datas[0].equals("club"))
+				{
+					if(datas.length == 2)
+					{
+						createClubInstance(_fs,datas[1]);
+					}
+					else if(datas.length == 3)
+					{
+						createClubInstance(_fs,datas[1],Integer.parseInt(datas[2]));
+					}
+				}
+			}
+			
+			reader.close();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
 	
+	//クラスフレームの設定
 	public static void setCreateFrame(AIFrameSystem _fs)
 	{
 		
@@ -115,6 +172,7 @@ public class FrameExample
 		_fs.writeSlotValue(_clubName, "memberNum", new Integer(_memberNum));
 	}
 	
+	//humanインスタンスの情報を出力
 	public static void printHumanInstance(AIFrameSystem _fs,String _name)
 	{
 		System.out.println("名前：" + _name);
@@ -122,7 +180,20 @@ public class FrameExample
 		System.out.println("体重："  + _fs.readSlotValue( _name, "weight_kg"));
 		System.out.println(" BMI："  + _fs.readSlotValue( _name, "bmi"));
 	}
-
+	
+	//studentインスタンスの情報を出力
+	public static void printStudentInstance(AIFrameSystem _fs,String _name)
+	{
+		printHumanInstance(_fs,_name);
+		System.out.println("所属："  + _fs.readSlotValue( _name, "memberOf"));
+	}
+	
+	//clubインスタンスの情報を出力
+	public static void printClubInstance(AIFrameSystem _fs,String _name)
+	{
+		System.out.println("名前：" + _name);
+		System.out.println("人数："  + _fs.readSlotValue( _name, "memberNum"));
+	}
 	
 	public static void main(String args[]) 
 	{
@@ -133,48 +204,19 @@ public class FrameExample
 		
 		setCreateFrame(fs);
 		
-		//各種clubのインスタンスフレームの作成
-		createClubInstance(fs,"computer",40);
-		createClubInstance(fs,"baseball",30);
-		createClubInstance(fs,"tennis",50);
-		
-		createHumanInstance(fs,"kato",180,70);
-		createStudentInstance(fs,"hirabayashi",170,64,"computer");
-		createStudentInstance(fs,"sato",160,80);
+		loadFrame(fs,"frameData.txt");
 		
 		System.out.println("----------------------------");
 		
-//		printHumanInstance(fs,"kato");
-		printHumanInstance(fs,"eto");
+		printHumanInstance(fs,"kato");
+		printHumanInstance(fs,"sato");
+		printStudentInstance(fs,"hirabayashi");
+		printStudentInstance(fs,"yamada");
 		
+		printClubInstance(fs,"computer");
+		printClubInstance(fs,"soccer");
+		printClubInstance(fs,"tennis");
 		
-		/*
-		System.out.println( fs.readSlotValue( "hirabayashi", "height_cm", false ) );
-		System.out.println( fs.readSlotValue( "hirabayashi", "weight_kg", false ) );
-		System.out.println( fs.readSlotValue( "hirabayashi", "bmi", false ) );
-		System.out.println( fs.readSlotValue( "hirabayashi", "memberOf", false ) );
-		
-		System.out.println( fs.readSlotValue( "sato", "height_cm", false ) );
-		System.out.println( fs.readSlotValue( "sato", "weight_kg", false ) );
-		System.out.println( fs.readSlotValue( "sato", "bmi", false ) );
-		System.out.println( fs.readSlotValue( "sato", "memberOf", false ) );
-		
-		
-		System.out.println(fs.readSlotValue( (String)fs.readSlotValue("hirabayashi","memberOf"), "memberNum"));
-		*/
-		
-		//データ表示
-		/*
-		System.out.println( fs.readSlotValue( "hirabayashi", "height_cm", false ) );
-		System.out.println( fs.readSlotValue( "hirabayashi", "weight_kg", false ) );
-		System.out.println( fs.readSlotValue( "hirabayashi", "bmi", false ) );
-		System.out.println( fs.readSlotValue( "hirabayashi", "memberOf", false ) );
-		*/
-		
-		//System.out.println( fs.readSlotValue( "student", "height_cm", false ) );
-		//System.out.println( fs.readSlotValue( "student", "weight_kg", false ) );
-		//System.out.println( fs.readSlotValue( "student", "bmi", false ) );
-
 	}
  
 }

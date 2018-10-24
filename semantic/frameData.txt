@@ -1,0 +1,7 @@
+human kato 180 70.0
+human sato 160 75.0
+student hirabayashi 170 64.0 computer
+student yamada 160 80
+club computer 40
+club tennis
+club soccer 20
