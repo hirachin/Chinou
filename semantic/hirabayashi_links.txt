@@ -1,0 +1,26 @@
+#平林は名工大生
+is-a hirabayashi NIT-student
+
+#森本は名工大生
+is-a morimoto NIT-student
+
+is-a sugiyama NIT-student
+is-a LA NIT-student
+is-a tajima NIT-student
+
+#知能演習2のチーム10のメンバー
+memberOf hirabayashi chinou2-team10
+memberOf sugiyama chinou2-team10
+memberOf LA chinou2-team10
+memberOf tajima chinou2-team10
+
+#平林はコンピュータ部に所属
+memberOf hirabayashi computerClub
+#森本はコンピュータ部に所属
+memberOf morimoto computerClub
+
+#パソコン持ってる
+own hirabayshi PC
+
+# 名古屋工業大学の学生は，学生である．
+is-a NIT-student student

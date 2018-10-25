@@ -20,7 +20,7 @@ hobby Taro baseball
 own Taro Ferrari 
 
 # 名古屋工業大学の学生は，学生である．
-is-a NIT-student student 
+is-a NIT-student student
 
 # 学生は勉強しない．
-donot student study 
+donot student study
