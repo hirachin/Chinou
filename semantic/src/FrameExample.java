@@ -4,6 +4,8 @@
 */
 
 import java.io.*;
+import java.util.*;
+
 
 public class FrameExample 
 {
@@ -206,6 +208,7 @@ public class FrameExample
 		
 		loadFrame(fs,"frameData.txt");
 		
+		/*
 		System.out.println("----------------------------");
 		
 		printHumanInstance(fs,"kato");
@@ -216,6 +219,31 @@ public class FrameExample
 		printClubInstance(fs,"computer");
 		printClubInstance(fs,"soccer");
 		printClubInstance(fs,"tennis");
+		
+		System.out.println("----------------------------");
+		*/
+		
+		
+		//検索をするための準備
+		System.out.println("インスタンスフレーム名 スロット名");
+		System.out.println("で検索してください");
+		ArrayList<String> questions = new ArrayList<String>();
+		Scanner sc = new Scanner(System.in);
+		String search;
+		  
+		//検索するものの入力
+		while(true)
+		{
+			System.out.print("検索文字列(0で終了):");
+			search = sc.nextLine();
+			if("0".equals(search))
+				break;
+			else
+				questions.add(search);
+		}
+		  
+		//検索を行う
+		fs.quest(fs,questions);
 		
 	}
  
