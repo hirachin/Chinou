@@ -99,7 +99,7 @@ public class FrameExample
 	}
 	
 	//クラスフレームの設定
-	public static void setCreateFrame(AIFrameSystem _fs)
+	public static void setClassFrame(AIFrameSystem _fs)
 	{
 		
 		// クラスフレーム human の生成
@@ -204,7 +204,7 @@ public class FrameExample
 		// フレームシステムの初期化
 		AIFrameSystem fs = new AIFrameSystem();
 		
-		setCreateFrame(fs);
+		setClassFrame(fs);
 		
 		loadFrame(fs,"frameData.txt");
 		
