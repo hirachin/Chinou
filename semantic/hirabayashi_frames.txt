@@ -1,0 +1,6 @@
+student hirabayashi 173 64 computer
+student sakai 180 70 computer
+student watanabe 170 65 pokemon
+
+club computer 40
+club pokemon 20

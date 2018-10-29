@@ -101,7 +101,6 @@ public class FrameExample
 	//クラスフレームの設定
 	public static void setClassFrame(AIFrameSystem _fs)
 	{
-		
 		// クラスフレーム human の生成
 		_fs.createClassFrame("human");
 		
@@ -206,24 +205,22 @@ public class FrameExample
 		
 		setClassFrame(fs);
 		
-		loadFrame(fs,"frameData.txt");
+		loadFrame(fs,"hirabayashi_frames.txt");
 		
-		/*
+		
 		System.out.println("----------------------------");
 		
-		printHumanInstance(fs,"kato");
-		printHumanInstance(fs,"sato");
 		printStudentInstance(fs,"hirabayashi");
-		printStudentInstance(fs,"yamada");
+		printStudentInstance(fs,"sakai");
+		printStudentInstance(fs,"watanabe");
 		
 		printClubInstance(fs,"computer");
-		printClubInstance(fs,"soccer");
-		printClubInstance(fs,"tennis");
+		printClubInstance(fs,"pokemon");
 		
 		System.out.println("----------------------------");
-		*/
 		
 		
+		/*
 		//検索をするための準備
 		System.out.println("インスタンスフレーム名 スロット名");
 		System.out.println("で検索してください");
@@ -244,6 +241,7 @@ public class FrameExample
 		  
 		//検索を行う
 		fs.quest(fs,questions);
+		*/
 		
 	}
  
