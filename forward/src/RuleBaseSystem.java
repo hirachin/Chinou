@@ -192,7 +192,7 @@ class RuleBase {
 		wm = new WorkingMemory();
 		loadAssertions(_assertionsFilePath);
 		rules = new ArrayList<Rule>();
-        loadRules(fileName);
+		loadRules(fileName);
 	}
 	
 	public void loadAssertions(String _path)
