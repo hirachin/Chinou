@@ -198,18 +198,14 @@ class RuleBase {
 	public void loadAssertions(String _path)
 	{
 		if(wm == null){return;}
-		
 		try
 		{
 			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(_path), "UTF-8"));
-			
 			String line;
-			
 			while((line = reader.readLine()) != null)
 			{
 				if(line.equals("") || line.charAt(0) == '#'){continue;}
 				wm.addAssertion(line);
-				
 			}
 			
 			reader.close();
