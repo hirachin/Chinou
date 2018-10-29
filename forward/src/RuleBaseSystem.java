@@ -1,16 +1,67 @@
 import java.util.*;
 import java.io.*;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+
+
 /**
  * RuleBaseSystem
  * 
  */
-public class RuleBaseSystem {
-    static RuleBase rb;
-    public static void main(String args[]){
-        rb = new RuleBase();
-        rb.forwardChain();      
-    }
+public class RuleBaseSystem extends JFrame
+{
+	/*public RuleBaseSystem() 
+	{
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setLayout(new FlowLayout());
+		//setSize(300, 150);
+		setSize(640, 480);
+		
+		// ボタン 1
+		JButton button = new JButton("add");
+		button.addActionListener(new AddAction());
+		add(button);
+
+		JButton button2 = new JButton("start");
+		button2.addActionListener(new StartAction());
+		
+		add(button2);
+	}
+	
+	class AddAction implements ActionListener
+	{
+		@Override public void actionPerformed(ActionEvent e)
+		{
+			rb.addAssertion("my-car is inexpensive");
+		}
+	}
+	
+	class StartAction implements ActionListener
+	{
+		@Override public void actionPerformed(ActionEvent e)
+		{
+			rb.forwardChain();     
+		}
+	}*/
+	
+	static RuleBase rb;
+	public static void main(String args[])
+	{
+		rb = new RuleBase("CarShop.data","CarShopAss.data");
+		rb.forwardChain();
+		
+		/*EventQueue.invokeLater(new Runnable() 
+		{
+			@Override public void run() 
+			{
+				RuleBaseSystem app = new RuleBaseSystem();
+				app.setVisible(true);
+			}
+		});*/
+		
+	}
 }
 
 /**
@@ -134,6 +185,46 @@ class RuleBase {
         rules = new ArrayList<Rule>();
         loadRules(fileName);
     }
+	
+	RuleBase(String _rulesFilePath,String _assertionsFilePath)
+	{
+		fileName = _rulesFilePath;
+		wm = new WorkingMemory();
+		loadAssertions(_assertionsFilePath);
+		rules = new ArrayList<Rule>();
+        loadRules(fileName);
+	}
+	
+	public void loadAssertions(String _path)
+	{
+		if(wm == null){return;}
+		
+		try
+		{
+			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(_path), "UTF-8"));
+			
+			String line;
+			
+			while((line = reader.readLine()) != null)
+			{
+				if(line.equals("") || line.charAt(0) == '#'){continue;}
+				wm.addAssertion(line);
+				
+			}
+			
+			reader.close();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	
+	public void addAssertion(String _assertion)
+	{
+		wm.addAssertion(_assertion);
+	}
 
     /**
      * 前向き推論を行うためのメソッド
