@@ -16,7 +16,7 @@ if      "?x is big"
 then    "?x is a foreign car"
 
 rule	"CarRule5"
-if	"?x is made in Japan"   	
+if	"?x is made in Japan"
 	"?x has Toyota's logo"
 then 	"?x is a Toyota"
 

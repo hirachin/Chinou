@@ -12,7 +12,9 @@ import java.awt.event.*;
  */
 public class RuleBaseSystem extends JFrame
 {
-	/*public RuleBaseSystem() 
+	JTextArea text;
+	
+	public RuleBaseSystem() 
 	{
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLayout(new FlowLayout());
@@ -21,20 +23,23 @@ public class RuleBaseSystem extends JFrame
 		
 		// ボタン 1
 		JButton button = new JButton("add");
-		button.addActionListener(new AddAction());
+		button.addActionListener(new AddAssertion());
 		add(button);
 
 		JButton button2 = new JButton("start");
 		button2.addActionListener(new StartAction());
-		
 		add(button2);
+		
+		text = new JTextArea(1,20);
+		add(text);
 	}
 	
-	class AddAction implements ActionListener
+	class AddAssertion implements ActionListener
 	{
 		@Override public void actionPerformed(ActionEvent e)
 		{
-			rb.addAssertion("my-car is inexpensive");
+			rb.addAssertion(text.getText());
+			text.setText("");
 		}
 	}
 	
@@ -44,22 +49,24 @@ public class RuleBaseSystem extends JFrame
 		{
 			rb.forwardChain();     
 		}
-	}*/
+	}
 	
 	static RuleBase rb;
 	public static void main(String args[])
 	{
-		rb = new RuleBase("CarShop.data","CarShopAss.data");
-		rb.forwardChain();
+		//rb = new RuleBase("CarShop.data","CarShopAss.data");
+		//rb.forwardChain();
 		
-		/*EventQueue.invokeLater(new Runnable() 
+		rb = new RuleBase("CarShop.data");
+		
+		EventQueue.invokeLater(new Runnable() 
 		{
 			@Override public void run() 
 			{
 				RuleBaseSystem app = new RuleBaseSystem();
 				app.setVisible(true);
 			}
-		});*/
+		});
 		
 	}
 }
@@ -185,6 +192,14 @@ class RuleBase {
         rules = new ArrayList<Rule>();
         loadRules(fileName);
     }
+	
+	RuleBase(String _rulesFilePath)
+	{
+		fileName = _rulesFilePath;
+		wm = new WorkingMemory();
+		rules = new ArrayList<Rule>();
+		loadRules(fileName);
+	}
 	
 	RuleBase(String _rulesFilePath,String _assertionsFilePath)
 	{
