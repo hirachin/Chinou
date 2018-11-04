@@ -11,18 +11,21 @@ public class RuleBaseSystem {
 	    System.out.println(" \"?x is b\" and \"?x is c\" are queries");
 	    System.out.println("  %java RuleBaseSystem \"?x is b,?x is c\"");
 	} else {
-	    fm = new FileManager();
-	    ArrayList<Rule> rules = fm.loadRules("CarShop.data");
-	    //ArrayList<Rule> rules = fm.loadRules("AnimalWorld.data");
-	    ArrayList<String> wm    = fm.loadWm("CarShopWm.data");
-	    //ArrayList<String> wm    = fm.loadWm("AnimalWorldWm.data");
-	    rb = new RuleBase(rules,wm);
-	    StringTokenizer st = new StringTokenizer(args[0],",");
-	    ArrayList<String> queries = new ArrayList<String>();
-	    for(int i = 0 ; i < st.countTokens();){
+		
+		fm = new FileManager();
+		ArrayList<Rule> rules = fm.loadRules("CarShop.data");
+		//ArrayList<Rule> rules = fm.loadRules("AnimalWorld.data");
+		ArrayList<String> wm    = fm.loadWm("CarShopWm.data");
+		//ArrayList<String> wm    = fm.loadWm("AnimalWorldWm.data");
+		rb = new RuleBase(rules,wm);
+		
+		StringTokenizer st = new StringTokenizer(args[0],",");
+		ArrayList<String> queries = new ArrayList<String>();
+		for(int i = 0 ; i < st.countTokens();){
 		queries.add(st.nextToken());
-	    }
-	    rb.backwardChain(queries);
+		}
+		rb.backwardChain(queries);
+		
 	}
     }
 }
