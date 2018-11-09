@@ -83,7 +83,7 @@ public class RuleBaseSystem extends JFrame implements Runnable
 	static JLabel resultLabel;
 	static JLabel assertionsLabel;
 	static JLabel queriesLabel;
-	static JLabel questionLabel;
+	static JLabel answerLabel;
 	
 	static RuleBase rb;
 	
@@ -127,6 +127,8 @@ public class RuleBaseSystem extends JFrame implements Runnable
 			
 			//推論の過程のログ
 			ArrayList<String> result = rb.forwardChainToArrayString();
+			
+			rb.wm.matchingAssertions(queries);
 			
 			logAnim = new LogAnim(result);
 			logAnim.setAssertions(oldAssertions);
@@ -211,14 +213,14 @@ public class RuleBaseSystem extends JFrame implements Runnable
 		resultLabel.setVerticalAlignment(JLabel.TOP);
 		resultLabel.setText("");
 		
-		//出力結果を表示するエリア
-		questionLabel = new JLabel();
-		questionLabel.setBounds(320,300,320,380);
+		//検索結果を表示するエリア
+		answerLabel = new JLabel();
+		answerLabel.setBounds(320,300,320,380);
 		//左詰めにする
-		questionLabel.setHorizontalAlignment(JLabel.LEADING);
+		answerLabel.setHorizontalAlignment(JLabel.LEADING);
 		//上詰めにする
-		questionLabel.setVerticalAlignment(JLabel.TOP);
-		questionLabel.setText("");
+		answerLabel.setVerticalAlignment(JLabel.TOP);
+		answerLabel.setText("");
 		
 		frame.add(addAssBt);
 		frame.add(addQryBt);
@@ -228,7 +230,7 @@ public class RuleBaseSystem extends JFrame implements Runnable
 		frame.add(assertionsLabel);
 		frame.add(queriesLabel);
 		frame.add(resultLabel);
-		frame.add(questionLabel);
+		frame.add(answerLabel);
 		
 		frame.show();
 	}
@@ -241,13 +243,23 @@ public class RuleBaseSystem extends JFrame implements Runnable
 	{
 		while(true)
 		{
-			//assTextが空の時addAssBtを無効化する
+			//assTextが空の時addAssBtを無効化する & アニメーション中無効
 			SwingUtilities.invokeLater(new Runnable()
 			{
 				public void run()
 				{
 					if(addAssBt == null || assText == null){return;}
-					addAssBt.setEnabled(!assText.getText().equals(""));
+					addAssBt.setEnabled(!assText.getText().equals("") && !isAnim);
+				}
+			});
+			
+			//qryTextが空の時addQryBtを無効化する & アニメーション中無効
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					if(addQryBt == null || qryText == null){return;}
+					addQryBt.setEnabled(!qryText.getText().equals("") && !isAnim);
 				}
 			});
 			
@@ -256,16 +268,18 @@ public class RuleBaseSystem extends JFrame implements Runnable
 			{
 				public void run()
 				{
-					if(startBt == null){return;}
-					startBt.setEnabled(!isAnim);
-					if(addAssBt == null){return;}
-					startBt.setEnabled(!isAnim);
-					if(assText == null){return;}
-					assText.setEnabled(!isAnim);
-					if(addQryBt == null){return;}
-					addQryBt.setEnabled(!isAnim);
-					if(qryText == null){return;}
-					qryText.setEnabled(!isAnim);
+					if(assText != null)
+					{
+						assText.setEnabled(!isAnim);
+					}
+					if(qryText != null)
+					{
+						qryText.setEnabled(!isAnim);
+					}
+					if(startBt != null)
+					{
+						startBt.setEnabled(!isAnim);
+					}
 				}
 			});
 			
@@ -292,6 +306,19 @@ public class RuleBaseSystem extends JFrame implements Runnable
 						if(printLog != null)
 						{
 							resultLabel.setText(printLog);
+						}
+						
+						//アニメーションが終了したら
+						if(!isAnim)
+						{
+							ArrayList<String> answers = new ArrayList<String>();
+							
+							for(int i = 0;i < queries.size();i++)
+							{
+								answers.addAll(rb.doQuery(queries.get(i)));
+							}
+							
+							answerLabel.setText(setAssertionsToHTML(answers));
 						}
 					}
 				}
@@ -639,7 +666,31 @@ class RuleBase {
             System.out.println(((Rule)rules.get(i)).toString());
         }
     }
-}
+
+	//質問の答えをワーキングメモリから探すメソッド
+    public ArrayList<String> doQuery(String pattern)
+	{
+		ArrayList<String> answers = new ArrayList<String>();
+		int judge = 0;
+		for(int i = 0; i < wm.assertions.size(); i++)
+		{
+			HashMap<String,String> binding = new HashMap<String,String>();
+			if((new Matcher()).matching(pattern, wm.assertions.get(i), binding))
+			{
+				answers.add("Ans:"+instantiate(pattern,binding));
+				judge++;
+			}
+		}
+		
+		if(judge == 0)
+		{
+			return null;
+		}
+		
+		return answers;
+	}
+	
+	}
 
 /**
  * ルールを表すクラス．
