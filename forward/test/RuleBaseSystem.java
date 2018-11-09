@@ -1,324 +1,37 @@
 import java.util.*;
 import java.io.*;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-
-
-class LogAnim
-{
-	private int count = 0;
-	private ArrayList<String> log;
-	
-	private String printData = "";
-	
-	//アサーションのアニメーション追加可視化用
-	private ArrayList<String> assertions;
-	
-	public void setAssertions(ArrayList<String> _assertions)
-	{
-		assertions = new ArrayList<String>(_assertions);
-	}
-	
-	public ArrayList<String> getAssertions()
-	{
-		return assertions;
-	}
-	
-	public LogAnim(ArrayList<String> _log)
-	{
-		log = new ArrayList<String>(_log);
-	}
-	
-	public void nextLine()
-	{
-		printData += "<br />";
-	}
-	
-	public boolean update()
-	{
-		if(count >= log.size()){return false;}
-		
-		String logData = log.get(count);
-		
-		if(logData.contains("apply"))
-		{
-			printData = logData;
-			nextLine();
-		}
-		
-		else if(logData.contains("Success"))
-		{
-			printData += logData;
-			assertions.add(logData.split(":")[1]);
-			nextLine();
-		}
-		
-		count++;
-		return true;
-	}
-	
-	public String getPrintData()
-	{
-		return "<html><body>" + printData + "</body></html>";
-	}
-}
-
-
 /**
  * RuleBaseSystem
  * 
  */
-public class RuleBaseSystem extends JFrame implements Runnable
-{
-	static LogAnim logAnim;
-	
-	static JTextArea assText;
-	static JTextArea qryText;
-	static JButton addAssBt;
-	static JButton addQryBt;
-	static JButton startBt;
-	
-	static JLabel resultLabel;
-	static JLabel assertionsLabel;
-	static JLabel queriesLabel;
-	static JLabel questionLabel;
-	
-	static RuleBase rb;
-	
-	static boolean isAnim = false;
-	
-	static ArrayList<String> queries;
-	
-	public RuleBaseSystem() 
-	{
-		new Thread(this).start();
-	}
-	
-	static class AddAssertion implements ActionListener
-	{
-		@Override public void actionPerformed(ActionEvent e)
-		{
-			rb.addAssertion(assText.getText());
-			assText.setText("");
-			//assertionsを更新する
-			assertionsLabel.setText(setAssertionsToHTML(rb.getWmAssertions()));
-		}
-	}
-	
-	static class AddQuery implements ActionListener
-	{
-		@Override public void actionPerformed(ActionEvent e)
-		{
-			queries.add(qryText.getText());
-			qryText.setText("");
-			//queryを更新する
-			queriesLabel.setText(setAssertionsToHTML(queries));
-		}
-	}
-	
-	static class StartAction implements ActionListener
-	{
-		@Override public void actionPerformed(ActionEvent e)
-		{
-			//LogAnimのアサーション用に推論前のを保存
-			ArrayList<String> oldAssertions = new ArrayList<String>(rb.getWmAssertions());
-			
-			//推論の過程のログ
-			ArrayList<String> result = rb.forwardChainToArrayString();
-			
-			logAnim = new LogAnim(result);
-			logAnim.setAssertions(oldAssertions);
-			isAnim = true;
-			
-			//GUI表示用のアサーションをLogAnimのものに設定
-			assertionsLabel.setText(setAssertionsToHTML(logAnim.getAssertions()));
-		}
-	}
-	
-	static String setAssertionsToHTML(ArrayList<String> assertions)
-	{
-		String str = "<html><body>";
-		for(String s:assertions)
-		{
-			str += s;
-			str+="<br />";
-		}
-		
-		str += "</body></html>";
-		
-		return str;
-	}
-
-	public static void main(String args[])
-	{
-		rb = new RuleBase("CarShop.data","CarShopAss.data");
-		queries = new ArrayList<String>();
-		
-		JFrame frame = new RuleBaseSystem();
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setLayout(null);
-		frame.setSize(640, 480);
-		
-		//アサーション追加ボタン
-		addAssBt = new JButton("addAssertion");
-		addAssBt.setBounds(50,10,100,20);
-		addAssBt.addActionListener(new AddAssertion());
-		
-		//クエリー追加ボタン
-		addQryBt = new JButton("addQuery");
-		addQryBt.setBounds(50,40,100,20);
-		addQryBt.addActionListener(new AddQuery());
-		
-		//推論開始ボタン
-		startBt = new JButton("start");
-		startBt.setBounds(50,70,100,20);
-		startBt.addActionListener(new StartAction());
-		
-		//追加アサーション記述テキストボックス
-		assText = new JTextArea(1,20);
-		assText.setBounds(160,10,200,20);
-		
-		//追加アサーション記述テキストボックス
-		qryText = new JTextArea(1,20);
-		qryText.setBounds(160,40,200,20);
-		
-		//アサーションを表示するエリア
-		assertionsLabel = new JLabel();
-		assertionsLabel.setBounds(0,100,320,200);
-		//左詰めにする
-		assertionsLabel.setHorizontalAlignment(JLabel.LEADING);
-		//上詰めにする
-		assertionsLabel.setVerticalAlignment(JLabel.TOP);
-		assertionsLabel.setText(setAssertionsToHTML(rb.getWmAssertions()));
-		
-		//クエリを表示するエリア
-		queriesLabel = new JLabel();
-		queriesLabel.setBounds(320,100,320,200);
-		//左詰めにする
-		queriesLabel.setHorizontalAlignment(JLabel.LEADING);
-		//上詰めにする
-		queriesLabel.setVerticalAlignment(JLabel.TOP);
-		queriesLabel.setText(setAssertionsToHTML(queries));
-		
-		//出力結果を表示するエリア
-		resultLabel = new JLabel();
-		resultLabel.setBounds(0,300,320,380);
-		//左詰めにする
-		resultLabel.setHorizontalAlignment(JLabel.LEADING);
-		//上詰めにする
-		resultLabel.setVerticalAlignment(JLabel.TOP);
-		resultLabel.setText("");
-		
-		//出力結果を表示するエリア
-		questionLabel = new JLabel();
-		questionLabel.setBounds(320,300,320,380);
-		//左詰めにする
-		questionLabel.setHorizontalAlignment(JLabel.LEADING);
-		//上詰めにする
-		questionLabel.setVerticalAlignment(JLabel.TOP);
-		questionLabel.setText("");
-		
-		frame.add(addAssBt);
-		frame.add(addQryBt);
-		frame.add(assText);
-		frame.add(qryText);
-		frame.add(startBt);
-		frame.add(assertionsLabel);
-		frame.add(queriesLabel);
-		frame.add(resultLabel);
-		frame.add(questionLabel);
-		
-		frame.show();
-	}
-	
-	
-	
-	int count=0;
-	
-	public void run()
-	{
-		while(true)
-		{
-			//assTextが空の時addAssBtを無効化する
-			SwingUtilities.invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					if(addAssBt == null || assText == null){return;}
-					addAssBt.setEnabled(!assText.getText().equals(""));
-				}
-			});
-			
-			//アニメーション中GUIの機能無効化
-			SwingUtilities.invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					if(startBt == null){return;}
-					startBt.setEnabled(!isAnim);
-					if(addAssBt == null){return;}
-					startBt.setEnabled(!isAnim);
-					if(assText == null){return;}
-					assText.setEnabled(!isAnim);
-					if(addQryBt == null){return;}
-					addQryBt.setEnabled(!isAnim);
-					if(qryText == null){return;}
-					qryText.setEnabled(!isAnim);
-				}
-			});
-			
-			//アニメーション実行
-			SwingUtilities.invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					if(!isAnim || resultLabel== null)
-					{
-						if(resultLabel== null){return;}
-						resultLabel.setText("");
-						return;
-					}
-					
-					//一定時間ごとにアニメーションを進める
-					if(count%10==0)
-					{
-						isAnim = logAnim.update();
-						assertionsLabel.setText(setAssertionsToHTML(logAnim.getAssertions()));
-						
-						String printLog = logAnim.getPrintData();
-					
-						if(printLog != null)
-						{
-							resultLabel.setText(printLog);
-						}
-					}
-				}
-			});
-			
-			try
-			{
-				Thread.sleep(100);
+public class RuleBaseSystem {
+    static RuleBase rb;
+    public static void main(String args[]){
+    	if(args.length != 1){
+    	    System.out.println("Usage: %java RuleBaseSystem [query strings]");
+    	    System.out.println("Example:");
+    	    System.out.println(" \"?x is b\" and \"?x is c\" are queries");
+    	    System.out.println("  %java RuleBaseSystem \"?x is b,?x is c\"");
+    	} 
+    	else {
+    		rb = new RuleBase();
+    		rb.forwardChain();
+    		StringTokenizer st = new StringTokenizer(args[0],",");
+    		ArrayList<String> queries = new ArrayList<String>();
+    		
+			for(int i = 0 ; i < st.countTokens();){
+    		queries.add(st.nextToken());
 			}
-			catch(Exception e){e.printStackTrace();}
 			
-			count++;
-		}
-	}
-
-	@Override public void paint(Graphics g)
-	{
-		super.paint(g);
-		paintLine(g,0,130,640,130);
-		paintLine(g,0,300,640,300);
-		paintLine(g,320,130,320,480);
-	}
-
-	void paintLine(Graphics g,int startX,int startY,int endX,int endY)
-	{
-		g.drawLine(startX, startY, endX, endY);
-	}
+			ArrayList result = rb.wm.matchingAssertions(queries);
+    		System.out.println();
+    		for(int i = 0; i < queries.size(); i++) {
+    			System.out.println("Query:"+queries.get(i));
+    			rb.doQuery(queries.get(i));
+    		}
+    	}
+    }
 }
 
 /**
@@ -415,11 +128,6 @@ class WorkingMemory {
     public String toString(){
         return assertions.toString();
     }
-	
-	public ArrayList<String> getAssertions()
-	{
-		return assertions;
-	}
     
 }
 
@@ -430,74 +138,28 @@ class WorkingMemory {
  */
 class RuleBase {
     String fileName;
+    String fileName_Wm;
     FileReader f;
     StreamTokenizer st;
     WorkingMemory wm;
     ArrayList<Rule> rules;
-	
-	public ArrayList<Rule> getRules(){return rules;}
     
     RuleBase(){
         fileName = "CarShop.data";
+        fileName_Wm = "CarShopWm.data";
+    	// fileName = "AnimalWorld.data";
+    	// fileName_Wm = "AnimalWorldWm.data";
         wm = new WorkingMemory();
-        wm.addAssertion("my-car is inexpensive");
-        wm.addAssertion("my-car has a VTEC engine");
-        wm.addAssertion("my-car is stylish");
-        wm.addAssertion("my-car has several color models");
-        wm.addAssertion("my-car has several seats");
-        wm.addAssertion("my-car is a wagon");
+        //wm.addAssertion("my-car is inexpensive");
+        //wm.addAssertion("my-car has a VTEC engine");
+        //wm.addAssertion("my-car is stylish");
+        //wm.addAssertion("my-car has several color models");
+        //wm.addAssertion("my-car has several seats");
+        //wm.addAssertion("my-car is a wagon");
         rules = new ArrayList<Rule>();
         loadRules(fileName);
+        loadWm(fileName_Wm);
     }
-	
-	RuleBase(String _rulesFilePath)
-	{
-		fileName = _rulesFilePath;
-		wm = new WorkingMemory();
-		rules = new ArrayList<Rule>();
-		loadRules(fileName);
-	}
-	
-	RuleBase(String _rulesFilePath,String _assertionsFilePath)
-	{
-		fileName = _rulesFilePath;
-		wm = new WorkingMemory();
-		loadAssertions(_assertionsFilePath);
-		rules = new ArrayList<Rule>();
-		loadRules(fileName);
-	}
-	
-	public void loadAssertions(String _path)
-	{
-		if(wm == null){return;}
-		try
-		{
-			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(_path), "UTF-8"));
-			String line;
-			while((line = reader.readLine()) != null)
-			{
-				if(line.equals("") || line.charAt(0) == '#'){continue;}
-				wm.addAssertion(line);
-			}
-			
-			reader.close();
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
-	
-	
-	public void addAssertion(String _assertion)
-	{
-		wm.addAssertion(_assertion);
-	}
-	
-	public ArrayList<String> getWmAssertions()
-	{
-		return wm.getAssertions();
-	}
 
     /**
      * 前向き推論を行うためのメソッド
@@ -534,45 +196,6 @@ class RuleBase {
         } while(newAssertionCreated);
         System.out.println("No rule produces a new assertion");
     }
-	
-	public ArrayList<String> forwardChainToArrayString()
-	{
-		ArrayList<String> result = new ArrayList<String>();
-		boolean newAssertionCreated;
-		// 新しいアサーションが生成されなくなるまで続ける．
-		do
-		{
-			newAssertionCreated = false;
-			for(int i = 0 ; i < rules.size(); i++)
-			{
-				Rule aRule = (Rule)rules.get(i);
-				result.add("apply :"+aRule.getName());
-				ArrayList<String> antecedents = aRule.getAntecedents();
-				String consequent  = aRule.getConsequent();
-				ArrayList bindings = wm.matchingAssertions(antecedents);
-				if(bindings != null)
-				{
-					for(int j = 0 ; j < bindings.size() ; j++)
-					{
-						//後件をインスタンシエーション
-						String newAssertion = instantiate((String)consequent, (HashMap)bindings.get(j));
-						//ワーキングメモリーになければ成功
-						if(!wm.contains(newAssertion))
-						{
-							result.add("Success: "+newAssertion);
-							wm.addAssertion(newAssertion);
-							newAssertionCreated = true;
-						}
-					}
-				}
-			}
-				result.add("Working Memory"+wm);
-		} while(newAssertionCreated);
-		
-		result.add("No rule produces a new assertion");
-		
-		return result;
-	}
 
     private String instantiate(String thePattern, HashMap theBindings){
         String result = new String();
@@ -638,6 +261,44 @@ class RuleBase {
         for(int i = 0 ; i < rules.size() ; i++){
             System.out.println(((Rule)rules.get(i)).toString());
         }
+    }
+    
+    //ワーキングメモリをロードするメソッド
+    public void loadWm(String theFileName) {
+    	String line;
+    	try{
+    	    int token;
+    	    f = new FileReader(theFileName);
+    	    st = new StreamTokenizer(f);
+    	    st.eolIsSignificant(true);
+    	    st.wordChars('\'','\'');
+    	    while((token = st.nextToken())!= StreamTokenizer.TT_EOF){
+    		line = new String();
+    		while( token != StreamTokenizer.TT_EOL){
+    		    line = line + st.sval + " ";
+    		    token = st.nextToken();
+    		}
+    		wm.addAssertion(line.trim());
+    	    }
+    	} catch(Exception e){
+    	    System.out.println(e);
+    	}
+    	System.out.println(wm.toString());
+        }
+    
+    //質問の答えをワーキングメモリから探すメソッド
+    public void doQuery(String pattern) {
+    	int judge = 0;
+    	for(int i = 0; i < wm.assertions.size(); i++) {
+    		HashMap<String,String> binding = new HashMap<String,String>();
+    		if((new Matcher()).matching(pattern, wm.assertions.get(i), binding)) {
+    			System.out.println("Ans:"+instantiate(pattern,binding));
+    			judge++;
+    		}
+    	}
+    	
+    	if(judge == 0)
+    		System.out.println("No");
     }
 }
 
