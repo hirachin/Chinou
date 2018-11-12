@@ -1,0 +1,63 @@
+*** GOALS ***[B on C, A on B]
+**B on C
+Place B on C
+*** GOALS ***[clear C, holding B]
+**clear C
+[clear A, clear B, clear C, ontable A, ontable B, ontable C, handEmpty]
+*** GOALS ***[holding B]
+**holding B
+pick up B from the table
+*** GOALS ***[ontable B, clear B, handEmpty]
+**ontable B
+[clear A, clear B, clear C, ontable A, ontable B, ontable C, handEmpty]
+*** GOALS ***[clear B, handEmpty]
+**clear B
+[clear A, clear B, clear C, ontable A, ontable B, ontable C, handEmpty]
+*** GOALS ***[handEmpty]
+**handEmpty
+pick up B from the table
+Place B on C
+[clear A, ontable A, ontable C, B on C, clear B, handEmpty]
+*** GOALS ***[A on B]
+**A on B
+Place A on B
+*** GOALS ***[clear B, holding A]
+**clear B
+[clear A, ontable A, ontable C, B on C, clear B, handEmpty]
+*** GOALS ***[holding A]
+**holding A
+remove A from on top ?y9
+*** GOALS ***[A on ?y9, clear A, handEmpty]
+**A on ?y9
+Place A on ?y11
+*** GOALS ***[clear ?y11, holding A]
+**clear ?y11
+[clear A, ontable A, ontable C, B on C, clear B, handEmpty]
+*** GOALS ***[holding A]
+**holding A
+pick up A from the table
+*** GOALS ***[ontable A, clear A, handEmpty]
+**ontable A
+[clear A, ontable A, ontable C, B on C, clear B, handEmpty]
+*** GOALS ***[clear A, handEmpty]
+**clear A
+[clear A, ontable A, ontable C, B on C, clear B, handEmpty]
+*** GOALS ***[handEmpty]
+**handEmpty
+pick up A from the table
+Place A on ?y11
+[ontable C, B on C, clear B, A on ?y11, clear A, handEmpty]
+*** GOALS ***[clear A, handEmpty]
+**clear A
+[ontable C, B on C, clear B, A on ?y11, clear A, handEmpty]
+*** GOALS ***[handEmpty]
+**handEmpty
+remove A from on top ?y9
+Place A on B
+***** This is a plan! *****
+pick up B from the table
+Place B on C
+pick up A from the table
+Place A on A
+remove A from on top A
+Place A on B

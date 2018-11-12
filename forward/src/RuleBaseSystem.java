@@ -593,20 +593,25 @@ class RuleBase {
         return str1.startsWith("?");
     }
 
-    private void loadRules(String theFileName){
+    private void loadRules(String theFileName)
+	{
         String line;
-        try{
+        try
+		{
             int token;
             f = new FileReader(theFileName);
             st = new StreamTokenizer(f);
-            while((token = st.nextToken())!= StreamTokenizer.TT_EOF){
-                switch(token){
+            while((token = st.nextToken())!= StreamTokenizer.TT_EOF)
+			{
+                switch(token)
+				{
                     case StreamTokenizer.TT_WORD:
                         String name = null;
                         ArrayList<String> antecedents = null;
                         String consequent = null;
-                        if("rule".equals(st.sval)){
-			    st.nextToken();
+                        if("rule".equals(st.sval))
+						{
+								st.nextToken();
 //                            if(st.nextToken() == '"'){
                                 name = st.sval;
                                 st.nextToken();
