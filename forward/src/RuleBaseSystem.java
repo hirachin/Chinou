@@ -80,10 +80,15 @@ public class RuleBaseSystem extends JFrame implements Runnable
 	static JButton addQryBt;
 	static JButton startBt;
 	
-	static JLabel resultLabel;
+	static JLabel assertionsTitleLabel;
+	static JLabel queriesTitleLabel;
+	static JLabel answerTitleLabel;
+	static JLabel resultTitleLabel;
+	
 	static JLabel assertionsLabel;
 	static JLabel queriesLabel;
-	static JLabel questionLabel;
+	static JLabel answerLabel;
+	static JLabel resultLabel;
 	
 	static RuleBase rb;
 	
@@ -128,6 +133,8 @@ public class RuleBaseSystem extends JFrame implements Runnable
 			//推論の過程のログ
 			ArrayList<String> result = rb.forwardChainToArrayString();
 			
+			rb.wm.matchingAssertions(queries);
+			
 			logAnim = new LogAnim(result);
 			logAnim.setAssertions(oldAssertions);
 			isAnim = true;
@@ -153,40 +160,65 @@ public class RuleBaseSystem extends JFrame implements Runnable
 
 	public static void main(String args[])
 	{
-		rb = new RuleBase("CarShop.data","CarShopAss.data");
+		//rb = new RuleBase("CarShop.data","CarShopAss.data");
+		rb = new RuleBase("CarShop.data");
 		queries = new ArrayList<String>();
 		
 		JFrame frame = new RuleBaseSystem();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(null);
-		frame.setSize(640, 480);
+		frame.setSize(1280, 960);
 		
 		//アサーション追加ボタン
 		addAssBt = new JButton("addAssertion");
-		addAssBt.setBounds(50,10,100,20);
+		addAssBt.setBounds(50,10,150,20);
 		addAssBt.addActionListener(new AddAssertion());
 		
 		//クエリー追加ボタン
 		addQryBt = new JButton("addQuery");
-		addQryBt.setBounds(50,40,100,20);
+		addQryBt.setBounds(50,40,150,20);
 		addQryBt.addActionListener(new AddQuery());
 		
 		//推論開始ボタン
 		startBt = new JButton("start");
-		startBt.setBounds(50,70,100,20);
+		startBt.setBounds(50,70,150,20);
 		startBt.addActionListener(new StartAction());
 		
 		//追加アサーション記述テキストボックス
 		assText = new JTextArea(1,20);
-		assText.setBounds(160,10,200,20);
+		assText.setBounds(210,10,200,20);
 		
 		//追加アサーション記述テキストボックス
 		qryText = new JTextArea(1,20);
-		qryText.setBounds(160,40,200,20);
+		qryText.setBounds(210,40,200,20);
+		
+		assertionsTitleLabel = new JLabel("アサーション");
+		assertionsTitleLabel.setBounds(0,100,320,30);
+		//中央にする
+		assertionsTitleLabel.setHorizontalAlignment(JLabel.CENTER);
+		assertionsTitleLabel.setVerticalAlignment(JLabel.TOP);
+		
+		queriesTitleLabel = new JLabel("クエリ");
+		queriesTitleLabel.setBounds(320,100,320,30);
+		//中央にする
+		queriesTitleLabel.setHorizontalAlignment(JLabel.CENTER);
+		queriesTitleLabel.setVerticalAlignment(JLabel.TOP);
+		
+		resultTitleLabel = new JLabel("推論過程");
+		resultTitleLabel.setBounds(640,100,320,30);
+		//中央にする
+		resultTitleLabel.setHorizontalAlignment(JLabel.CENTER);
+		resultTitleLabel.setVerticalAlignment(JLabel.TOP);
+		
+		answerTitleLabel = new JLabel("質問結果");
+		answerTitleLabel.setBounds(960,100,320,30);
+		//中央にする
+		answerTitleLabel.setHorizontalAlignment(JLabel.CENTER);
+		answerTitleLabel.setVerticalAlignment(JLabel.TOP);
 		
 		//アサーションを表示するエリア
 		assertionsLabel = new JLabel();
-		assertionsLabel.setBounds(0,100,320,200);
+		assertionsLabel.setBounds(0,130,320,200);
 		//左詰めにする
 		assertionsLabel.setHorizontalAlignment(JLabel.LEADING);
 		//上詰めにする
@@ -195,7 +227,7 @@ public class RuleBaseSystem extends JFrame implements Runnable
 		
 		//クエリを表示するエリア
 		queriesLabel = new JLabel();
-		queriesLabel.setBounds(320,100,320,200);
+		queriesLabel.setBounds(320,130,320,200);
 		//左詰めにする
 		queriesLabel.setHorizontalAlignment(JLabel.LEADING);
 		//上詰めにする
@@ -204,31 +236,35 @@ public class RuleBaseSystem extends JFrame implements Runnable
 		
 		//出力結果を表示するエリア
 		resultLabel = new JLabel();
-		resultLabel.setBounds(0,300,320,380);
+		resultLabel.setBounds(640,130,320,200);
 		//左詰めにする
 		resultLabel.setHorizontalAlignment(JLabel.LEADING);
 		//上詰めにする
 		resultLabel.setVerticalAlignment(JLabel.TOP);
 		resultLabel.setText("");
 		
-		//出力結果を表示するエリア
-		questionLabel = new JLabel();
-		questionLabel.setBounds(320,300,320,380);
+		//検索結果を表示するエリア
+		answerLabel = new JLabel();
+		answerLabel.setBounds(960,130,320,200);
 		//左詰めにする
-		questionLabel.setHorizontalAlignment(JLabel.LEADING);
+		answerLabel.setHorizontalAlignment(JLabel.LEADING);
 		//上詰めにする
-		questionLabel.setVerticalAlignment(JLabel.TOP);
-		questionLabel.setText("");
+		answerLabel.setVerticalAlignment(JLabel.TOP);
+		answerLabel.setText("");
 		
 		frame.add(addAssBt);
 		frame.add(addQryBt);
 		frame.add(assText);
 		frame.add(qryText);
 		frame.add(startBt);
+		frame.add(assertionsTitleLabel);
+		frame.add(queriesTitleLabel);
+		frame.add(resultTitleLabel);
+		frame.add(answerTitleLabel);
 		frame.add(assertionsLabel);
 		frame.add(queriesLabel);
 		frame.add(resultLabel);
-		frame.add(questionLabel);
+		frame.add(answerLabel);
 		
 		frame.show();
 	}
@@ -241,13 +277,23 @@ public class RuleBaseSystem extends JFrame implements Runnable
 	{
 		while(true)
 		{
-			//assTextが空の時addAssBtを無効化する
+			//assTextが空の時addAssBtを無効化する & アニメーション中無効
 			SwingUtilities.invokeLater(new Runnable()
 			{
 				public void run()
 				{
 					if(addAssBt == null || assText == null){return;}
-					addAssBt.setEnabled(!assText.getText().equals(""));
+					addAssBt.setEnabled(!assText.getText().equals("") && !isAnim);
+				}
+			});
+			
+			//qryTextが空の時addQryBtを無効化する & アニメーション中無効
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					if(addQryBt == null || qryText == null){return;}
+					addQryBt.setEnabled(!qryText.getText().equals("") && !isAnim);
 				}
 			});
 			
@@ -256,16 +302,18 @@ public class RuleBaseSystem extends JFrame implements Runnable
 			{
 				public void run()
 				{
-					if(startBt == null){return;}
-					startBt.setEnabled(!isAnim);
-					if(addAssBt == null){return;}
-					startBt.setEnabled(!isAnim);
-					if(assText == null){return;}
-					assText.setEnabled(!isAnim);
-					if(addQryBt == null){return;}
-					addQryBt.setEnabled(!isAnim);
-					if(qryText == null){return;}
-					qryText.setEnabled(!isAnim);
+					if(assText != null)
+					{
+						assText.setEnabled(!isAnim);
+					}
+					if(qryText != null)
+					{
+						qryText.setEnabled(!isAnim);
+					}
+					if(startBt != null)
+					{
+						startBt.setEnabled(!isAnim);
+					}
 				}
 			});
 			
@@ -293,9 +341,24 @@ public class RuleBaseSystem extends JFrame implements Runnable
 						{
 							resultLabel.setText(printLog);
 						}
+						
+						//アニメーションが終了したら
+						if(!isAnim)
+						{
+							ArrayList<String> answers = new ArrayList<String>();
+							
+							for(int i = 0;i < queries.size();i++)
+							{
+								answers.addAll(rb.doQuery(queries.get(i)));
+							}
+							
+							answerLabel.setText(setAssertionsToHTML(answers));
+						}
 					}
 				}
 			});
+			
+			super.repaint();
 			
 			try
 			{
@@ -310,9 +373,11 @@ public class RuleBaseSystem extends JFrame implements Runnable
 	@Override public void paint(Graphics g)
 	{
 		super.paint(g);
-		paintLine(g,0,130,640,130);
-		paintLine(g,0,300,640,300);
-		paintLine(g,320,130,320,480);
+		paintLine(g,0,130,1280,130);
+		paintLine(g,0,150,1280,150);
+		paintLine(g,320,130,320,960);
+		paintLine(g,640,130,640,960);
+		paintLine(g,960,130,960,960);
 	}
 
 	void paintLine(Graphics g,int startX,int startY,int endX,int endY)
@@ -644,7 +709,31 @@ class RuleBase {
             System.out.println(((Rule)rules.get(i)).toString());
         }
     }
-}
+
+	//質問の答えをワーキングメモリから探すメソッド
+    public ArrayList<String> doQuery(String pattern)
+	{
+		ArrayList<String> answers = new ArrayList<String>();
+		int judge = 0;
+		for(int i = 0; i < wm.assertions.size(); i++)
+		{
+			HashMap<String,String> binding = new HashMap<String,String>();
+			if((new Matcher()).matching(pattern, wm.assertions.get(i), binding))
+			{
+				answers.add("Ans:"+instantiate(pattern,binding));
+				judge++;
+			}
+		}
+		
+		if(judge == 0)
+		{
+			return null;
+		}
+		
+		return answers;
+	}
+	
+	}
 
 /**
  * ルールを表すクラス．

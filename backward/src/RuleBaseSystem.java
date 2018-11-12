@@ -1,7 +1,250 @@
 import java.util.*;
 import java.io.*;
 
-public class RuleBaseSystem {
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+
+
+public class RuleBaseSystem extends JFrame implements Runnable
+{
+	static JTextArea assText;
+	static JTextArea qryText;
+	static JButton addAssBt;
+	static JButton addQryBt;
+	static JButton startBt;
+	
+	static JLabel assertionsTitleLabel;
+	static JLabel queriesTitleLabel;
+	static JLabel answerTitleLabel;
+	
+	static JLabel assertionsLabel;
+	static JLabel queriesLabel;
+	static JLabel answerLabel;
+	
+	static RuleBase rb;
+		
+	static ArrayList<String> queries;
+	
+	public RuleBaseSystem() 
+	{
+		new Thread(this).start();
+	}
+	
+	static class AddAssertion implements ActionListener
+	{
+		@Override public void actionPerformed(ActionEvent e)
+		{
+			rb.addAssertion(assText.getText());
+			assText.setText("");
+			//assertionsを更新する
+			assertionsLabel.setText(setAssertionsToHTML(rb.getWmAssertions()));
+		}
+	}
+	
+	static class AddQuery implements ActionListener
+	{
+		@Override public void actionPerformed(ActionEvent e)
+		{
+			queries.add(qryText.getText());
+			qryText.setText("");
+			//queryを更新する
+			queriesLabel.setText(setAssertionsToHTML(queries));
+		}
+	}
+	
+	static class StartAction implements ActionListener
+	{
+		@Override public void actionPerformed(ActionEvent e)
+		{
+			//LogAnimのアサーション用に推論前のを保存
+			ArrayList<String> oldAssertions = new ArrayList<String>(rb.getWmAssertions());
+			
+			//推論の過程のログ
+			ArrayList<String> result = rb.backwardChainToString(queries);
+			
+			//GUI表示用のアサーションをLogAnimのものに設定
+			answerLabel.setText(setAssertionsToHTML(result));
+		}
+	}
+	
+	static String setAssertionsToHTML(ArrayList<String> assertions)
+	{
+		String str = "<html><body>";
+		for(String s:assertions)
+		{
+			str += s;
+			str+="<br />";
+		}
+		
+		str += "</body></html>";
+		
+		return str;
+	}
+
+	public static void main(String args[])
+	{
+		FileManager fm = new FileManager();
+		ArrayList<Rule> rules = fm.loadRules("CarShop.data");
+		//ArrayList<Rule> rules = fm.loadRules("AnimalWorld.data");
+		ArrayList<String> wm    = fm.loadWm("CarShopWm.data");
+		//ArrayList<String> wm    = fm.loadWm("AnimalWorldWm.data");
+		
+		rb = new RuleBase(rules,wm);
+		queries = new ArrayList<String>();
+		
+		JFrame frame = new RuleBaseSystem();
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setLayout(null);
+		frame.setSize(1280, 960);
+		
+		//アサーション追加ボタン
+		addAssBt = new JButton("addAssertion");
+		addAssBt.setBounds(50,10,100,20);
+		addAssBt.addActionListener(new AddAssertion());
+		
+		//クエリー追加ボタン
+		addQryBt = new JButton("addQuery");
+		addQryBt.setBounds(50,40,100,20);
+		addQryBt.addActionListener(new AddQuery());
+		
+		//推論開始ボタン
+		startBt = new JButton("start");
+		startBt.setBounds(50,70,100,20);
+		startBt.addActionListener(new StartAction());
+		
+		//追加アサーション記述テキストボックス
+		assText = new JTextArea(1,20);
+		assText.setBounds(160,10,200,20);
+		
+		//追加アサーション記述テキストボックス
+		qryText = new JTextArea(1,20);
+		qryText.setBounds(160,40,200,20);
+		
+		assertionsTitleLabel = new JLabel("アサーション");
+		assertionsTitleLabel.setBounds(0,100,320,30);
+		//中央にする
+		assertionsTitleLabel.setHorizontalAlignment(JLabel.CENTER);
+		assertionsTitleLabel.setVerticalAlignment(JLabel.TOP);
+		
+		queriesTitleLabel = new JLabel("クエリ");
+		queriesTitleLabel.setBounds(320,100,320,30);
+		//中央にする
+		queriesTitleLabel.setHorizontalAlignment(JLabel.CENTER);
+		queriesTitleLabel.setVerticalAlignment(JLabel.TOP);
+		
+		answerTitleLabel = new JLabel("質問結果");
+		answerTitleLabel.setBounds(640,100,320,30);
+		//中央にする
+		answerTitleLabel.setHorizontalAlignment(JLabel.CENTER);
+		answerTitleLabel.setVerticalAlignment(JLabel.TOP);
+		
+		//アサーションを表示するエリア
+		assertionsLabel = new JLabel();
+		assertionsLabel.setBounds(0,130,320,200);
+		//左詰めにする
+		assertionsLabel.setHorizontalAlignment(JLabel.LEADING);
+		//上詰めにする
+		assertionsLabel.setVerticalAlignment(JLabel.TOP);
+		assertionsLabel.setText(setAssertionsToHTML(rb.getWmAssertions()));
+		
+		//クエリを表示するエリア
+		queriesLabel = new JLabel();
+		queriesLabel.setBounds(320,130,320,200);
+		//左詰めにする
+		queriesLabel.setHorizontalAlignment(JLabel.LEADING);
+		//上詰めにする
+		queriesLabel.setVerticalAlignment(JLabel.TOP);
+		queriesLabel.setText(setAssertionsToHTML(queries));
+		
+		//検索結果を表示するエリア
+		answerLabel = new JLabel();
+		answerLabel.setBounds(640,130,320,200);
+		//左詰めにする
+		answerLabel.setHorizontalAlignment(JLabel.LEADING);
+		//上詰めにする
+		answerLabel.setVerticalAlignment(JLabel.TOP);
+		answerLabel.setText("");
+		
+		frame.add(addAssBt);
+		frame.add(addQryBt);
+		frame.add(assText);
+		frame.add(qryText);
+		frame.add(startBt);
+		frame.add(assertionsTitleLabel);
+		frame.add(queriesTitleLabel);
+		frame.add(answerTitleLabel);
+		frame.add(assertionsLabel);
+		frame.add(queriesLabel);
+		frame.add(answerLabel);
+		
+		frame.show();
+	}
+	
+	
+	public void run()
+	{
+		while(true)
+		{
+			//assTextが空の時addAssBtを無効化する
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					if(addAssBt == null || assText == null){return;}
+					addAssBt.setEnabled(!assText.getText().equals(""));
+				}
+			});
+			
+			//qryTextが空の時addQryBtを無効化する
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					if(addQryBt == null || qryText == null){return;}
+					addQryBt.setEnabled(!qryText.getText().equals(""));
+				}
+			});
+			
+			//queriesが空の時startBtを無効化する
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					if(startBt == null){return;}
+					startBt.setEnabled(!queries.isEmpty());
+				}
+			});
+			
+			super.repaint();
+			
+			try
+			{
+				Thread.sleep(100);
+			}
+			catch(Exception e){e.printStackTrace();}
+		}
+	}
+
+	@Override public void paint(Graphics g)
+	{
+		super.paint(g);
+		paintLine(g,0,130,1280,130);
+		paintLine(g,0,150,1280,150);
+		paintLine(g,320,130,320,960);
+		paintLine(g,640,130,640,960);
+		paintLine(g,960,130,960,960);
+	}
+
+	void paintLine(Graphics g,int startX,int startY,int endX,int endY)
+	{
+		g.drawLine(startX, startY, endX, endY);
+	}
+}
+
+
+
+/*public class RuleBaseSystem {
     static RuleBase rb;
     static FileManager fm;
     public static void main(String args[]){
@@ -28,7 +271,7 @@ public class RuleBaseSystem {
 		
 	}
     }
-}
+}*/
     
 class RuleBase implements Serializable{
     String fileName;
@@ -39,6 +282,11 @@ class RuleBase implements Serializable{
 	wm = theWm;
 	rules = theRules;
     }
+	
+	public void addAssertion(String _assertion)
+	{
+		wm.add(_assertion);
+	}
 
     public void setWm(ArrayList<String> theWm){
 	wm = theWm;
@@ -47,6 +295,11 @@ class RuleBase implements Serializable{
     public void setRules(ArrayList<Rule> theRules){
 	rules = theRules;
     }
+	
+	public ArrayList<String> getWmAssertions()
+	{
+		return wm;
+	}
 
     public void backwardChain(ArrayList<String> hypothesis){
 	System.out.println("Hypothesis:"+hypothesis);
@@ -67,6 +320,36 @@ class RuleBase implements Serializable{
 	} else {
 	    System.out.println("No");
 	}
+	}
+	
+	public ArrayList<String> backwardChainToString(ArrayList<String> hypothesis)
+	{
+		ArrayList<String> result = new ArrayList<String>();
+		
+		//result.add("Hypothesis:"+hypothesis);
+		ArrayList<String> orgQueries = (ArrayList)hypothesis.clone();
+		//HashMap<String,String> binding = new HashMap<String,String>();
+		HashMap<String,String> binding = new HashMap<String,String>();
+		if(matchingPatterns(hypothesis,binding))
+		{
+			//result.add("Yes");
+			//result.add(binding);
+			// 最終的な結果を基のクェリーに代入して表示する
+			for(int i = 0 ; i < orgQueries.size() ; i++)
+			{
+				String aQuery = (String)orgQueries.get(i);
+				//result.add("binding: "+binding);
+				String anAnswer = instantiate(aQuery,binding);
+				//result.add("Query: "+aQuery);
+				result.add("Answer:"+anAnswer);
+			}
+		}
+		else 
+		{
+			result.add("No");
+		}
+		
+		return result;
     }
 
     /**
