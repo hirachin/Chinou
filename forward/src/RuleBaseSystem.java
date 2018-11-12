@@ -85,8 +85,6 @@ public class RuleBaseSystem extends JFrame implements Runnable
 	static JLabel answerTitleLabel;
 	static JLabel resultTitleLabel;
 	
-	
-	
 	static JLabel assertionsLabel;
 	static JLabel queriesLabel;
 	static JLabel answerLabel;

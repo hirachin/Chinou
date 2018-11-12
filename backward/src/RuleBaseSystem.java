@@ -14,6 +14,10 @@ public class RuleBaseSystem extends JFrame implements Runnable
 	static JButton addQryBt;
 	static JButton startBt;
 	
+	static JLabel assertionsTitleLabel;
+	static JLabel queriesTitleLabel;
+	static JLabel answerTitleLabel;
+	
 	static JLabel assertionsLabel;
 	static JLabel queriesLabel;
 	static JLabel answerLabel;
@@ -92,7 +96,7 @@ public class RuleBaseSystem extends JFrame implements Runnable
 		JFrame frame = new RuleBaseSystem();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(null);
-		frame.setSize(640, 480);
+		frame.setSize(1280, 960);
 		
 		//アサーション追加ボタン
 		addAssBt = new JButton("addAssertion");
@@ -117,9 +121,27 @@ public class RuleBaseSystem extends JFrame implements Runnable
 		qryText = new JTextArea(1,20);
 		qryText.setBounds(160,40,200,20);
 		
+		assertionsTitleLabel = new JLabel("アサーション");
+		assertionsTitleLabel.setBounds(0,100,320,30);
+		//中央にする
+		assertionsTitleLabel.setHorizontalAlignment(JLabel.CENTER);
+		assertionsTitleLabel.setVerticalAlignment(JLabel.TOP);
+		
+		queriesTitleLabel = new JLabel("クエリ");
+		queriesTitleLabel.setBounds(320,100,320,30);
+		//中央にする
+		queriesTitleLabel.setHorizontalAlignment(JLabel.CENTER);
+		queriesTitleLabel.setVerticalAlignment(JLabel.TOP);
+		
+		answerTitleLabel = new JLabel("質問結果");
+		answerTitleLabel.setBounds(640,100,320,30);
+		//中央にする
+		answerTitleLabel.setHorizontalAlignment(JLabel.CENTER);
+		answerTitleLabel.setVerticalAlignment(JLabel.TOP);
+		
 		//アサーションを表示するエリア
 		assertionsLabel = new JLabel();
-		assertionsLabel.setBounds(0,100,320,200);
+		assertionsLabel.setBounds(0,130,320,200);
 		//左詰めにする
 		assertionsLabel.setHorizontalAlignment(JLabel.LEADING);
 		//上詰めにする
@@ -128,7 +150,7 @@ public class RuleBaseSystem extends JFrame implements Runnable
 		
 		//クエリを表示するエリア
 		queriesLabel = new JLabel();
-		queriesLabel.setBounds(320,100,320,200);
+		queriesLabel.setBounds(320,130,320,200);
 		//左詰めにする
 		queriesLabel.setHorizontalAlignment(JLabel.LEADING);
 		//上詰めにする
@@ -137,7 +159,7 @@ public class RuleBaseSystem extends JFrame implements Runnable
 		
 		//検索結果を表示するエリア
 		answerLabel = new JLabel();
-		answerLabel.setBounds(320,300,320,380);
+		answerLabel.setBounds(640,130,320,200);
 		//左詰めにする
 		answerLabel.setHorizontalAlignment(JLabel.LEADING);
 		//上詰めにする
@@ -149,6 +171,9 @@ public class RuleBaseSystem extends JFrame implements Runnable
 		frame.add(assText);
 		frame.add(qryText);
 		frame.add(startBt);
+		frame.add(assertionsTitleLabel);
+		frame.add(queriesTitleLabel);
+		frame.add(answerTitleLabel);
 		frame.add(assertionsLabel);
 		frame.add(queriesLabel);
 		frame.add(answerLabel);
@@ -191,6 +216,8 @@ public class RuleBaseSystem extends JFrame implements Runnable
 				}
 			});
 			
+			super.repaint();
+			
 			try
 			{
 				Thread.sleep(100);
@@ -202,9 +229,11 @@ public class RuleBaseSystem extends JFrame implements Runnable
 	@Override public void paint(Graphics g)
 	{
 		super.paint(g);
-		paintLine(g,0,130,640,130);
-		paintLine(g,320,300,640,300);
-		paintLine(g,320,130,320,480);
+		paintLine(g,0,130,1280,130);
+		paintLine(g,0,150,1280,150);
+		paintLine(g,320,130,320,960);
+		paintLine(g,640,130,640,960);
+		paintLine(g,960,130,960,960);
 	}
 
 	void paintLine(Graphics g,int startX,int startY,int endX,int endY)
