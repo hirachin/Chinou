@@ -1,21 +1,23 @@
 import java.util.*;
 import java.io.*;
 
+
 public class Planner 
 {
 	Vector operators;
 	Random rand;
 	Vector plan;
 
-	public static void main(String argv[]) 
+	/*public static void main(String argv[]) 
 	{
 		(new Planner()).start();
-	}
+	}*/
 
-	Planner() 
+	Planner()
 	{
 		rand = new Random();
 	}
+
 
 	public void start() 
 	{
@@ -36,6 +38,27 @@ public class Planner
 			Operator op = (Operator) plan.elementAt(i);
 			System.out.println((op.instantiate(theBinding)).name);
 		}
+	}
+
+	public ArrayList<String> startAndgetPlan() 
+	{
+		initOperators("testOperators.data");
+		Vector goalList = initGoalList("goalList.data");
+		Vector initialState = initInitialState("initialState.data");
+
+		Hashtable theBinding = new Hashtable();
+		plan = new Vector();
+		planning(goalList, initialState, theBinding);
+
+		ArrayList<String>  newPlan = new ArrayList<String>();
+
+		for (int i = 0; i < plan.size(); i++) 
+		{
+			Operator op = (Operator) plan.elementAt(i);
+			newPlan.add((op.instantiate(theBinding)).name);
+		}
+
+		return newPlan;
 	}
 
 	private boolean planning(Vector theGoalList, Vector theCurrentState, Hashtable theBinding) 
@@ -442,7 +465,7 @@ public class Planner
 
 						// ルールの生成
 						Operator operator = new Operator(name,ifList, addList, deleteList);
-						System.out.println(operator);
+						//System.out.println(operator);
                         operators.addElement(operator);
 						break;
 					}
