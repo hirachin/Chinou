@@ -1,4 +1,4 @@
-NAME    "Place ?x on ?y"
+NAME    "place ?x on ?y"
 IF  "clear ?y"
     "holding ?x"
 ADD "?x on ?y"
