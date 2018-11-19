@@ -24,25 +24,51 @@ public class PlanningGUI extends JFrame implements Runnable
 
         if(datas[0].equals("place") && datas.length == 4)
         {
-            field.placeOn(datas[1], datas[3]);
+            String a = splitState(datas[1]).getName();
+            String b = splitState(datas[3]).getName();
+            field.placeOn(a,b);
         }
 
         else if(datas[0].equals("remove") && datas.length == 6)
         {
-            field.removeFrom(datas[1], datas[5]);
+            String a = splitState(datas[1]).getName();
+            String b = splitState(datas[5]).getName();
+            field.removeFrom(a,b);
         }
         
         else if(datas[0].equals("pick") && datas.length == 6)
         {
-            field.pickUpFromTable(datas[2]);
+            String a = splitState(datas[2]).getName();
+            field.pickUpFromTable(a);
         }
 
         else if(datas[0].equals("put") && datas.length == 6)
         {
-            field.putDownOnTable(datas[2]);
+            String a = splitState(datas[2]).getName();
+            field.putDownOnTable(a);
         }
     }
 
+    static State splitState(String _state)
+    {
+        String[] datas = _state.split("\\(");
+
+        if(datas.length != 2)
+        {
+            return new State(_state,null,null);
+        }
+
+        String name = datas[0];
+
+        //形と色を分離
+        //")"を除いてから分離している
+         datas = _state.split("\\)")[0].split(",");
+
+        String shape = datas[0];
+        String color = datas[1];
+
+        return new State(name,shape,color);
+    }
 
     static class GoNext implements ActionListener
     {

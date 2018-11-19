@@ -6,13 +6,37 @@ public class Block
 {
     private Point m_pos;
     private Point m_size;
+
     private String m_name;
+    private String m_shape = null;
+    private String m_color = null;
+    
+    private void setNameAndState(String _name)
+    {   
+        //名前と(形,色)を分離
+        String[] datas = _name.split("\\(");
+
+        if(datas.length != 2)
+        {
+            m_name = _name;
+            return;
+        }
+
+        m_name = datas[0];
+
+        //形と色を分離
+        //")"を除いてから分離している
+         datas = _name.split("\\)")[0].split(",");
+
+        m_shape = datas[0];
+        m_color = datas[1];
+    }
 
     public Block(Point _pos,Point _size,String _name)
     {
         m_pos = _pos;
         m_size = _size;
-        m_name = _name;
+        setNameAndState(_name);
     }
 
     public Block(int _posX,int _posY,int _sizeX,int _sizeY,String _name)

@@ -24,6 +24,9 @@ public class Planner
 		initOperators("testOperators.data");
 		Vector goalList = initGoalList("goalList.data");
 		Vector initialState = initInitialState("initialState.data");
+
+		ArrayList<State> states = initStates("States.data");
+		goalList = renewGoalList(goalList,states);
 		//initOperators();
 		//Vector goalList = initGoalList();
 		//Vector initialState = initInitialState();
@@ -46,6 +49,9 @@ public class Planner
 		Vector goalList = initGoalList("goalList.data");
 		Vector initialState = initInitialState("initialState.data");
 
+		ArrayList<State> states = initStates("states.data");
+		goalList = renewGoalList(goalList,states);
+
 		Hashtable theBinding = new Hashtable();
 		plan = new Vector();
 		planning(goalList, initialState, theBinding);
@@ -55,7 +61,12 @@ public class Planner
 		for (int i = 0; i < plan.size(); i++) 
 		{
 			Operator op = (Operator) plan.elementAt(i);
-			newPlan.add((op.instantiate(theBinding)).name);
+			String resultOperator = (op.instantiate(theBinding)).name;
+			resultOperator = plusState(resultOperator, states);
+			newPlan.add(resultOperator);
+
+			//Operator op = (Operator) plan.elementAt(i);
+			//newPlan.add((op.instantiate(theBinding)).name);
 		}
 
 		return newPlan;
@@ -283,7 +294,7 @@ public class Planner
 		}
 		catch(Exception e)
 		{
-            System.out.println(e);
+            e.printStackTrace();
 		}
 
 		return goalList;
@@ -319,7 +330,7 @@ public class Planner
 		}
 		catch(Exception e)
 		{
-            System.out.println(e);
+            e.printStackTrace();
 		}
 		
 		return initialState;
@@ -477,9 +488,136 @@ public class Planner
                 }
 
             }
-        } catch(Exception e){
-            System.out.println(e);
-        }
+		} catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	//ゴールリストのブロックの特徴を名前に変更する
+	private Vector renewGoalList(Vector goalList, ArrayList<State> States)
+	{
+		//返すベクター型を用意
+		Vector newGoalList = new Vector();
+
+		for(int i = 0; i < goalList.size(); i++)
+		{
+			//ゴールリストを一つずつ取り出し特徴があれば名前に変更する
+			String goal = (String)goalList.elementAt(i);
+
+			String[] goalToken = goal.split(" ");
+			String newGoal = "";
+
+			for(int j = 0; j < goalToken.length; j++)
+			{
+				boolean judge = false;
+				for(int k = 0; k < States.size(); k++)
+				{
+
+					State theState = States.get(k);
+
+					if(goalToken[j].split(",").length == 2)
+					{
+						if(theState.judgeFeature(goalToken[j].split(",")[0],goalToken[j].split(",")[1]))
+						{
+							newGoal = newGoal+" "+theState.getName();
+							judge = true;
+						}
+					}
+					else
+					{
+						if(theState.judgeFeature(goalToken[j]) || theState.getName().equals(goalToken[j]))
+						{
+							newGoal = newGoal+" "+theState.getName();
+							judge = true;
+						}
+					}
+				}
+
+				if(judge == false && j % 2 == 0)
+				{
+					//存在しないブロックの特徴の場合
+					System.out.println("ゴール状態:"+goal+"で特徴:"+goalToken[j]+"のような特徴を持ったブロックは存在しない");
+					System.exit(-1);
+				}
+				else if(judge == false)
+					newGoal = newGoal+" "+goalToken[j];
+			}
+
+			//System.out.println(newGoal.trim());
+			newGoalList.addElement(newGoal.trim());
+		}
+
+		return newGoalList;
+	}
+
+	//外部から物質の状態を読み込むメソッド
+	private ArrayList<State> initStates(String _path)
+	{
+		ArrayList<State> States = new ArrayList<State>();
+		try
+		{
+			FileReader f = new FileReader(_path);
+			StreamTokenizer st = new StreamTokenizer(f);
+
+			//ファイルから読み取る
+			while(st.nextToken() != StreamTokenizer.TT_EOF)
+			{
+				String feature = st.sval;
+				String theName = "";
+				String theShape = "";
+				String theColour = "";
+
+				String[] features = feature.split(",",0);
+				for(int i = 0; i < features.length; i++)
+				{
+					if(i == 0)
+						theName = features[i];
+					if(i == 1)
+						theShape = features[i];
+					if(i == 2)
+						theColour = features[i];
+				}
+
+				State newState = new State(theName,theShape,theColour);
+				States.add(newState);
+			}
+		}
+		catch(Exception e)
+		{
+			System.out.println(e);
+		}
+
+		return States;
+	}
+	
+	//結果の表示にブロックの情報をプラスする
+	private String plusState(String resultOperator, ArrayList<State> States)
+	{
+		String[] resultSplit = resultOperator.split(" ");
+		String newResult = "";
+		for(int i = 0; i < resultSplit.length; i++)
+		{
+			boolean judge = false;
+			for(int j = 0; j < States.size(); j++)
+			{
+				if(States.get(j).judgeName(resultSplit[i]))
+				{
+					newResult = newResult+" "+States.get(j).rename(resultSplit[i]);
+					judge = true;
+				}
+			}
+
+			if(judge == false)
+				newResult = newResult+" "+resultSplit[i];
+		}
+
+		if(newResult.charAt(0) == ' ')
+		{
+			newResult = newResult.substring(1);	
+		}
+
+		return newResult;
 	}
 
 }
