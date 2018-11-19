@@ -8,9 +8,9 @@ public class Field
 {
     private HashMap<String,Block> m_hashMap = new HashMap<String,Block>();
 
-    int tableY = 400;
+    int tableY = 500;
 
-    Point handPos = new Point(700,200);
+    Point handPos = new Point(700,300);
     Point handSize = new Point(150,150);
 
     public Field()
@@ -36,6 +36,7 @@ public class Field
         g.drawLine(50, tableY, 950, tableY);
 
         g.drawRect(handPos.x,handPos.y,handSize.x,handSize.y);
+        g.drawString("hand",handPos.x + 50 ,handPos.y + handSize.y + 20);
 
         for(String key :m_hashMap.keySet())
         {

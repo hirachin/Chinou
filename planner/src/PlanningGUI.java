@@ -4,12 +4,17 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
+
 public class PlanningGUI extends JFrame implements Runnable
 {
+    private static final long serialVersionUID = 1L;
+    
     static ArrayList<String> plan;
     static int planIdx = 0;
 
     static JButton nextBt;
+    static JButton resetBt;
+    static JButton rePlanBt;
 
     static Field field;
     
@@ -52,10 +57,33 @@ public class PlanningGUI extends JFrame implements Runnable
         }   
     }
 
+    static class Reset implements ActionListener
+    {
+        @Override public void actionPerformed(ActionEvent e)
+        {
+            System.out.println("resetBt pushed");
+            field = new Field();
+            planIdx = 0; 
+            nextBt.setEnabled(true);
+
+        }   
+    }
+
+    static class RePlan implements ActionListener
+    {
+        @Override public void actionPerformed(ActionEvent e)
+        {
+            System.out.println("rePlanBt pushed");
+            plan = new Planner().startAndgetPlan();
+            field = new Field();
+            planIdx = 0; 
+            nextBt.setEnabled(true);
+        }   
+    }
+
     public PlanningGUI()
     {
-        Planner planner = new Planner();
-        plan = planner.startAndgetPlan();
+        plan = new Planner().startAndgetPlan();
 
         field = new Field();
 
@@ -73,15 +101,20 @@ public class PlanningGUI extends JFrame implements Runnable
     {
         while(true)
         {
-            /*
+            
             SwingUtilities.invokeLater(new Runnable()
             {
                 public void run()
                 {
+                    if(nextBt == null){return;}
 
+                    if(planIdx >= plan.size())
+                    {
+                        nextBt.setEnabled(false);
+                    }
                 }
             });
-            */
+            
             super.repaint();
 
             try
@@ -104,7 +137,17 @@ public class PlanningGUI extends JFrame implements Runnable
         nextBt.setBounds(50,10,150,20);
         nextBt.addActionListener(new GoNext());
 
+        resetBt = new JButton("reset");
+        resetBt.setBounds(210,10,150,20);
+        resetBt.addActionListener(new Reset());
+
+        rePlanBt = new JButton("rePlan");
+        rePlanBt.setBounds(370,10,150,20);
+        rePlanBt.addActionListener(new RePlan());
+        
         frame.add(nextBt);
+        frame.add(resetBt);
+        frame.add(rePlanBt);
         frame.setVisible(true);
     }
 
@@ -114,10 +157,5 @@ public class PlanningGUI extends JFrame implements Runnable
         g.drawLine(0,100,1280,100);
 
         field.draw(g);
-    }
-
-    public void drawBlocks(Graphics g)
-    {
-       new Block(150,150,50,50,"A").draw(g);
     }
 }
