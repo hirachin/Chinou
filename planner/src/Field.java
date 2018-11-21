@@ -1,6 +1,5 @@
 import java.awt.Graphics;
-import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.*;
 import java.util.HashMap;
 import java.awt.Point;
 
@@ -15,7 +14,7 @@ public class Field
 
     public Field()
     {
-        load();
+        load("states.data","initialState.data");
     }
 
     public Point getDrawHandAreaPos(Block b)
@@ -26,9 +25,62 @@ public class Field
 
     public void load()
     {
-        m_hashMap.put("A", new Block(100,tableY - 100,100,100,"A"));
-        m_hashMap.put("B", new Block(300,tableY - 100,100,100,"B"));
-        m_hashMap.put("C", new Block(500,tableY - 100,100,100,"C"));
+        m_hashMap.put("A", new Block(100,tableY - 100,100,100,"A(square,red)"));
+        m_hashMap.put("B", new Block(300,tableY - 100,100,100,"B(triangle,blue)"));
+        m_hashMap.put("C", new Block(500,tableY - 100,100,100,"C(parallelogram,green)"));
+    }
+
+    public void load(String _stateFilePath,String _initFilePath)
+    {
+       try
+       {
+            int posX = 100;
+            int token;
+            
+           
+
+            FileReader f = new FileReader(_stateFilePath);
+            StreamTokenizer st = new StreamTokenizer(f);
+
+			
+            while((token = st.nextToken())!= StreamTokenizer.TT_EOF)
+			{
+                String[] datas = st.sval.split(",");
+                m_hashMap.put(datas[0], new Block(posX,300,datas[0],datas[1],datas[2]));
+                posX += 200;
+            }
+
+		} catch(Exception e)
+		{
+			e.printStackTrace();
+        }
+        
+        try
+        {
+             int token;
+             FileReader f = new FileReader(_initFilePath);
+             StreamTokenizer st = new StreamTokenizer(f);
+             
+             while((token = st.nextToken())!= StreamTokenizer.TT_EOF)
+             {
+                String[] datas = st.sval.split(" ");
+
+                if(datas[0].equals("ontable") && datas.length == 2)
+                {
+                   onTable(datas[1]);
+                }
+                else if(datas.length == 3 && datas[1].equals("on"))
+                {
+                    placeOn(datas[0], datas[2]);
+                }
+             }
+
+        } catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+
+       
     }
 
     public void draw(Graphics g)
@@ -127,6 +179,14 @@ public class Field
         if(isOnTable(_a)){return false;}
         
         a.setPos(getEmptyTablePosX(),tableY - a.getSize().y);
+        return true;
+    }
+
+    public boolean onTable(String _a)
+    {
+        Block a = m_hashMap.get(_a);
+        if(a == null){return false;}
+        a.setPos(a.getPos().x,tableY - a.getSize().y);
         return true;
     }
 }
