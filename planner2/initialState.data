@@ -1,0 +1,11 @@
+"clear A"
+"clear B"
+"clear C"
+"not holding A"
+"not holding B"
+"not holding C"
+
+"ontable A"
+"ontable B"
+"ontabl C"
+"handEmpty"
