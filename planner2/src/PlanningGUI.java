@@ -160,15 +160,15 @@ public class PlanningGUI extends JFrame implements Runnable
         frame.setSize(1280, 960);
 
         nextBt = new JButton("next");
-        nextBt.setBounds(50,10,150,20);
+        nextBt.setBounds(50,10,150,30);
         nextBt.addActionListener(new GoNext());
 
         resetBt = new JButton("reset");
-        resetBt.setBounds(210,10,150,20);
+        resetBt.setBounds(210,10,150,30);
         resetBt.addActionListener(new Reset());
 
         rePlanBt = new JButton("rePlan");
-        rePlanBt.setBounds(370,10,150,20);
+        rePlanBt.setBounds(370,10,150,30);
         rePlanBt.addActionListener(new RePlan());
         
         frame.add(nextBt);
@@ -179,9 +179,17 @@ public class PlanningGUI extends JFrame implements Runnable
 
     @Override public void paint(Graphics g)
     {
-        super.paint(g);
-        g.drawLine(0,100,1280,100);
 
-        field.draw(g);
+        Dimension size = getSize();
+        Image back = createImage(size.width,size.height);
+
+        Graphics buffer = back.getGraphics();
+
+        super.paint(buffer);
+        buffer.drawLine(0,100,1280,100);
+
+        field.draw(buffer);
+
+        g.drawImage(back,0,0,this);
     }
 }
