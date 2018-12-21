@@ -1,70 +1,51 @@
-import java.io.*;
-import java.util.*;
+import java.io.FileReader;
+import java.io.StreamTokenizer;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Random;
+import java.util.StringTokenizer;
+import java.util.Vector;
 
 public class Planner
 {
 	Vector operators;
 	Vector initialState;
 	Vector goalList;
+	Vector banList;
 	ArrayList<State> states;
-	
+
+	static final double rule = 1.0;
+
 	Random rand;
 	Vector plan;
 	int trials;
 
-	/*
-	public static void main(String argv[])
-	{
-		long start = System.currentTimeMillis();
-		(new Planner()).start();
-		long end = System.currentTimeMillis();
-		
-		System.out.println("Time:"+(end - start)+"ms");
-	}*/
 
-	//ゴール状態を下から並び替えるメソッド
-	private Vector sortGoalList(Vector goalList)
+	/*public static void main(String argv[])
 	{
 		int repeat = 0;
-		int repeat_limit = (goalList.size()*goalList.size() - goalList.size()) / 2;
-		for(int i = 0; i < goalList.size()-1; i++)
-		{
-			//ゴールリストから一つ取り出す
-			String goal = (String)goalList.elementAt(i);
-			String[] goalToken = goal.split(" ");
-			for(int j = i+1; j < goalList.size(); j++)
-			{
-				String comGoal = (String)goalList.elementAt(j);
-				String[] comGoalToken = comGoal.split(" ");
-				if(comGoalToken[0].equals(goalToken[0]))
-				{
-					//先頭が同じトークンならゴール不可(AonB,AonC)
-					System.out.println(goal+"と"+comGoal+"はゴール不可です");
-					System.exit(-1);
-				}
+		File f = new File("resultImp_2.csv");
+		try(BufferedWriter bw = new BufferedWriter(new FileWriter(f))){
+			while(repeat < 100) {
+				//本文
+				long start = System.nanoTime();
+				Planner planDo = new Planner();
+				planDo.start();
+				long end = System.nanoTime();
 
-				if(repeat > repeat_limit)
-				{
-					//AonB,BonAでは無限に続くので強制終了
-					System.out.println("無限ループです");
-					System.exit(-1);
-				}
-
-				if(goalToken[2].equals(comGoalToken[0]))
-				{
-					//自分より下の状態を記述したゴールがあれば場所を入れ替え
-					goalList.set(i,comGoal);
-					goalList.set(j,goal);
-					i--;
-					repeat++;
-					break;					
-				}
+				System.out.println("Time:"+(end - start) / 1000000f+"ms");
+				//本文終了
+				bw.write(planDo.plan.size()+","+planDo.trials+","+(end-start) / 1000000f);
+				bw.newLine();
+				repeat++;
 			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		
-		//並べ替えた後のゴールリストを返す
-		return goalList;
-	}
+
+	}*/
 
 	Planner()
 	{
@@ -73,6 +54,7 @@ public class Planner
 		initOperators("testOperators.data");
 		goalList = initGoalList("goalList.data");
 		initialState = initInitialState("initialState.data");
+		banList = initBanList("banList.data");
 		states = initStates("states.data");
 	}
 
@@ -86,6 +68,13 @@ public class Planner
 		*/
 
 		goalList = renewGoalList(goalList,states);
+		banList = renewGoalList(banList,states);
+		if(inBanList(goalList,banList))
+		{
+			System.out.println("ゴールが物理的制約に反しています");
+			System.exit(-1);
+		}
+		goalList = sortGoalList(goalList);
 		//initOperators();
 		//Vector goalList = initGoalList();
 		//Vector initialState = initInitialState();
@@ -98,19 +87,7 @@ public class Planner
 		if(judge == false)
 		{
 			System.out.println("無限ループ");
-			Vector goalClone = initGoalList("goalList.data");
-			goalClone = reverseList(goalClone);
-			Vector initialClone = initInitialState("initialState.data");
-			Hashtable theBindingClone = new Hashtable();
-			plan = new Vector();
-			trials = 0;
-			uniqueNum  = 0;
-			randomOperators();
-			
-			judge = planning(goalClone, initialClone,theBindingClone);
-			
-			if(judge == false)
-				System.exit(-1);
+			System.exit(-1);
 		}
 		System.out.println("***** This is a plan! *****");
 		for (int i = 0; i < plan.size(); i++)
@@ -124,53 +101,27 @@ public class Planner
 		System.out.println("PlanSize:"+plan.size());
 		System.out.println("Trials:"+trials);
 	}
-	
-	//古い
-	/*
-	public ArrayList<String> startAndgetPlan()
-	{
-		goalList = renewGoalList(goalList,states);
-		
-		Hashtable theBinding = new Hashtable();
-		plan = new Vector();
-		
-		long start = System.currentTimeMillis();
-		planning(goalList,initialState,theBinding);
-		long end = System.currentTimeMillis();
-		
-		ArrayList<String> newPlan = new ArrayList<String>();
-		
-		for(int i = 0; i < plan.size(); i++)
-		{
-			Operator op = (Operator)plan.elementAt(i);
-			String resultOperator = (op.instantiate(theBinding)).name;
-			resultOperator = plusState(resultOperator, states);
-			newPlan.add(resultOperator.trim());
-		}
-		
-		System.out.println("***result***");
-		System.out.println("PlanSize:"+plan.size());
-		System.out.println("Trials:"+trials);
-		System.out.println("Time:"+(end - start)+"ms");
-		
-		return newPlan;
-	}
-	*/
 
 	public ArrayList<String> startAndgetPlan()
 	{
 		goalList = renewGoalList(goalList,states);
+		banList = renewGoalList(banList,states);
+		if(inBanList(goalList,banList))
+		{
+			System.out.println("ゴールが物理的制約に反しています");
+			System.exit(-1);
+		}
 		goalList = sortGoalList(goalList);
-		
+
 		Hashtable theBinding = new Hashtable();
 		plan = new Vector();
-		
+
 		long start = System.currentTimeMillis();
 		planning(goalList,initialState,theBinding);
 		long end = System.currentTimeMillis();
-		
+
 		ArrayList<String> newPlan = new ArrayList<String>();
-		
+
 		for(int i = 0; i < plan.size(); i++)
 		{
 			Operator op = (Operator)plan.elementAt(i);
@@ -178,36 +129,15 @@ public class Planner
 			resultOperator = plusState(resultOperator, states);
 			newPlan.add(resultOperator.trim());
 		}
-		
+
 		System.out.println("***result***");
 		System.out.println("PlanSize:"+plan.size());
 		System.out.println("Trials:"+trials);
 		System.out.println("Time:"+(end - start)+"ms");
-		
+
 		return newPlan;
 	}
-	
-	private int judgeGoal(Vector goalList, Vector currentState)
-	{
-		for(int i = 0; i < goalList.size(); i++)
-		{
-			if(!currentState.contains(goalList.elementAt(i)))
-			{
-				return 1;
-			}		
-		}
-		return 0;
-	}
-	
-	private Vector reverseList(Vector list)
-	{
-		Vector newList = new Vector();
-		for(int i = list.size() - 1; i >= 0; i--)
-		{
-			newList.addElement(list.elementAt(i));
-		}
-		return newList;
-	}
+
 
 	private boolean planning(Vector theGoalList, Vector theCurrentState, Hashtable theBinding)
 	{
@@ -233,7 +163,7 @@ public class Planner
 			while (cPoint < operators.size())
 			{
 				//変数が50以上なら無限ループと見なす
-				if(uniqueNum > 50)
+				if(uniqueNum > 50000)
 					return false;
 				// System.out.println("cPoint:"+cPoint);
 				// Store original binding
@@ -323,12 +253,48 @@ public class Planner
 
 		//theGoalがtheCurrentStateで既に満たされているか確認
 		int size = theCurrentState.size();
+		String[] buf = theGoal.split(" ");
+		String x_buf = "";
+		String y_buf = "";
+		for(int i = 0; i < buf.length; i++)
+		{
+			if(buf[i].startsWith("?"))
+			{
+				if(buf[i].contains("y"))
+				{
+					y_buf = buf[i];
+					x_buf = buf[i].replace("y","x");
+				}
+			}
+		}
+
+		// 現在のCurrent state, Binding, planをbackup
+		Hashtable orgBinding = new Hashtable();
+		for (Enumeration e = theBinding.keys(); e.hasMoreElements();)
+		{
+			String key = (String) e.nextElement();
+			String value = (String) theBinding.get(key);
+			orgBinding.put(key, value);
+		}
+
 		for (int i = 0; i < size; i++)
 		{
 			String aState = (String) theCurrentState.elementAt(i);
 			if ((new Unifier()).unify(theGoal, aState, theBinding))
 			{
-				return 0;
+				if(theBinding.get(y_buf) == null || theBinding.get(x_buf) == null)
+					return 0;
+				else if(!(theBinding.get(x_buf).equals(theBinding.get(y_buf))))
+					return 0;
+				else
+					// 失敗したら元に戻す．
+					theBinding.clear();
+					for (Enumeration e = orgBinding.keys(); e.hasMoreElements();)
+					{
+						String key = (String) e.nextElement();
+						String value = (String) orgBinding.get(key);
+						theBinding.put(key, value);
+					}
 			}
 		}
 
@@ -337,11 +303,18 @@ public class Planner
 		//Operator op = (Operator) operators.elementAt(randInt);
 		//operators.removeElementAt(randInt);
 		//operators.addElement(op);
-		
+
+		//ヒューリスティックに基づいてソート
+		heuristicOperators(theGoal, theCurrentState, theBinding);
+
 		//優先度でソート
+		/*double randDouble = Math.random();
+		if(randDouble < rule)
+			randomOperators();
+
 		Collections.sort(operators, new OperatorComparator());
 		//優先度をリセット
-		resetOperators();
+		resetOperators();*/
 
 
 		for (int i = cPoint; i < operators.size(); i++)
@@ -349,7 +322,7 @@ public class Planner
 			Operator anOperator = rename((Operator) operators.elementAt(i));
 
 			// 現在のCurrent state, Binding, planをbackup
-			Hashtable orgBinding = new Hashtable();
+			orgBinding = new Hashtable();
 			for (Enumeration e = theBinding.keys(); e.hasMoreElements();)
 			{
 				String key = (String) e.nextElement();
@@ -373,17 +346,17 @@ public class Planner
 			{
 				if ((new Unifier()).unify(theGoal, (String) addList.elementAt(j), theBinding))
 				{
-					changePriorityOperator(anOperator);
+					//changePriorityOperator(anOperator);
 					Operator newOperator = anOperator.instantiate(theBinding);
 					Vector newGoals = (Vector) newOperator.getIfList();
 					System.out.println(newOperator.name);
-					if (planning(newGoals, theCurrentState, theBinding))
+					if (planning(newGoals, theCurrentState, theBinding) && !inBanList(newOperator.instantiate(theBinding).addList,banList))
 					{
-						System.out.println(newOperator.name);
-						
+						System.out.println("追加するオペレータ:"+newOperator.name);
+
 						newOperator = newOperator.instantiate(theBinding);
-						changePriorityOperator(anOperator);
-						
+						//changePriorityOperator(anOperator);
+
 						plan.addElement(newOperator);
 						theCurrentState = newOperator.applyState(theCurrentState);
 						return i + 1;
@@ -644,7 +617,7 @@ public class Planner
 											deleteList.add(st.sval);
 											st.nextToken();
 										}
-										
+
 										if("PRIORITY".equals(st.sval))
 										{
 											st.nextToken();
@@ -675,6 +648,29 @@ public class Planner
         }
 	}
 
+	//禁止リストを外部から読み込むメソッド
+	private Vector initBanList(String _path)
+	{
+		Vector banList = new Vector();
+
+		try
+		{
+			FileReader f = new FileReader(_path);
+			StreamTokenizer st = new StreamTokenizer(f);
+
+            while(st.nextToken() != StreamTokenizer.TT_EOF)
+			{
+            	String ban = st.sval;
+            	banList.addElement(st.sval);
+            }
+		}
+		catch(Exception e)
+		{
+            System.out.println(e);
+		}
+
+		return banList;
+	}
 
 	//ゴールリストのブロックの特徴を名前に変更する
 	private Vector renewGoalList(Vector goalList, ArrayList<State> States)
@@ -716,7 +712,7 @@ public class Planner
 					}
 				}
 
-				if(judge == false && j % 2 == 0)
+				if(judge == false && j % 2 == 0 &&!goalToken[j].startsWith("?"))
 				{
 					//存在しないブロックの特徴の場合
 					System.out.println("ゴール状態:"+goal+"で特徴:"+goalToken[j]+"のような特徴を持ったブロックは存在しない");
@@ -731,6 +727,50 @@ public class Planner
 		}
 
 		return newGoalList;
+	}
+
+	//ゴール状態を下から並び替えるメソッド
+	private Vector sortGoalList(Vector goalList)
+	{
+		int repeat = 0;
+		int repeat_limit = (goalList.size()*goalList.size() - goalList.size()) / 2;
+		for(int i = 0; i < goalList.size()-1; i++)
+		{
+			//ゴールリストから一つ取り出す
+			String goal = (String)goalList.elementAt(i);
+			String[] goalToken = goal.split(" ");
+			for(int j = i+1; j < goalList.size(); j++)
+			{
+				String comGoal = (String)goalList.elementAt(j);
+				String[] comGoalToken = comGoal.split(" ");
+				if(comGoalToken[0].equals(goalToken[0]) || comGoalToken[2].equals(goalToken[2]))
+				{
+					//先頭もしくは最後が同じトークンならゴール不可(AonB,AonC or B on A, C on A)
+					System.out.println(goal+"と"+comGoal+"はゴール不可です");
+					System.exit(-1);
+				}
+
+				if(repeat > repeat_limit)
+				{
+					//AonB,BonAでは無限に続くので強制終了
+					System.out.println("無限ループです");
+					System.exit(-1);
+				}
+
+				if(goalToken[2].equals(comGoalToken[0]))
+				{
+					//自分より下の状態を記述したゴールがあれば場所を入れ替え
+					goalList.set(i,comGoal);
+					goalList.set(j,goal);
+					i--;
+					repeat++;
+					break;
+				}
+			}
+		}
+
+		//並べ替えた後のゴールリストを返す
+		return goalList;
 	}
 
 	//外部から物質の状態を読み込むメソッド
@@ -772,7 +812,7 @@ public class Planner
 
 		return States;
 	}
-	
+
 	//結果の表示にブロックの情報をプラスする
 	private String plusState(String resultOperator, ArrayList<State> States)
 	{
@@ -796,7 +836,7 @@ public class Planner
 
 		return newResult;
 	}
-	
+
 	//Operatorsの中身の優先度をリセットするメソッド
 	private void resetOperators() {
 		for(int i = 0; i < operators.size(); i++) {
@@ -805,15 +845,15 @@ public class Planner
 			operators.set(i,reOpe);
 		}
 	}
-	
+
 	//Operatorの優先度を変えるメソッド
 	private void changePriorityOperator(Operator op) {
-		
+
 		//選択したオペレータがPlaceの場合
 		if(op.name.contains("Place")) {
 			for(int i = 0; i < operators.size(); i++) {
 				Operator theOp = (Operator)operators.elementAt(i);
-				if(theOp.name.contains("remove")) {
+				if(theOp.name.contains("remove") || op.name.contains("Place")) {
 					int pri = theOp.getPriority();
 					theOp.setPriority(pri - 1);
 					operators.removeElementAt(i);
@@ -822,12 +862,12 @@ public class Planner
 				}
 			}
 		}
-		
+
 		//選択したオペレータがremoveの場合
 		else if(op.name.contains("remove")) {
 			for(int i = 0; i < operators.size(); i++) {
 				Operator theOp = (Operator)operators.elementAt(i);
-				if(theOp.name.contains("Place")) {
+				if(theOp.name.contains("Place") || theOp.name.contains("remove")) {
 					int pri = theOp.getPriority();
 					theOp.setPriority(pri - 1);
 					operators.removeElementAt(i);
@@ -836,12 +876,12 @@ public class Planner
 				}
 			}
 		}
-		
+
 		//選択したオペレータがputの場合
 		else if(op.name.contains("put")) {
 			for(int i = 0; i < operators.size(); i++) {
 				Operator theOp = (Operator)operators.elementAt(i);
-				if(theOp.name.contains("pick")) {
+				if(theOp.name.contains("pick") || theOp.name.contains("put")) {
 					int pri = theOp.getPriority();
 					theOp.setPriority(pri - 1);
 					operators.removeElementAt(i);
@@ -850,12 +890,12 @@ public class Planner
 				}
 			}
 		}
-		
+
 		//選択したオペレータがpickの場合
 		else if(op.name.contains("pick")) {
 			for(int i = 0; i < operators.size(); i++) {
 				Operator theOp = (Operator)operators.elementAt(i);
-				if(theOp.name.contains("put")) {
+				if(theOp.name.contains("put") || theOp.name.contains("pick")) {
 					int pri = theOp.getPriority();
 					theOp.setPriority(pri - 1);
 					operators.removeElementAt(i);
@@ -865,7 +905,7 @@ public class Planner
 			}
 		}
 	}
-	
+
 	//オペレータの優先度をランダムに
 	private void randomOperators() {
 		for(int i = 0; i < operators.size(); i++) {
@@ -874,6 +914,104 @@ public class Planner
 			theOp.setPriority(randInt);
 			System.out.println(theOp);
 			operators.set(i,theOp);
+		}
+	}
+
+	//リストがbanListにあるかどうかの判定(あったらtrue)
+	private boolean inBanList(Vector lists, Vector banList)
+	{
+		for(int i = 0; i < lists.size(); i++)
+		{
+			String list = (String)lists.get(i);
+			for(int j = 0; j < banList.size(); j++)
+			{
+				String ban = (String)banList.get(j);
+				String[] listToken = list.split(" ");
+				String[] banToken = ban.split(" ");
+				int judge = 0;
+				if(listToken.length == banToken.length)
+				{
+					for(int k = 0; k < listToken.length; k++)
+					{
+						if(banToken[k].startsWith("?"))
+							judge++;
+						else if(listToken[k].equals(banToken[k]))
+							judge++;
+					}
+				}
+				if(judge == listToken.length)
+				{
+					System.out.println("NG:"+list+"<-"+ban);
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	//ヒューリスティックに基づいてオペレータを入れ替え
+	private void heuristicOperators(String theGoal, Vector theCurrentState, Hashtable theBinding)
+	{
+		String[] goalToken = theGoal.split(" ");
+		if(goalToken.length == 2)
+		{
+			if(goalToken[0].equals("holding"))
+			{
+				//目標がholdingかつ対象が地面にあればpickを選択
+				if(theCurrentState.contains("ontable "+goalToken[1]))
+				{
+					for(int i = 0; i < operators.size(); i++)
+					{
+						Operator op = (Operator)operators.elementAt(i);
+						if(op.name.contains("pick"))
+						{
+							operators.setElementAt((Operator)operators.elementAt(0),i);
+							operators.setElementAt(op, 0);
+						}
+					}
+				}
+				//対象が地面にないならremoveを選択
+				else
+				{
+					for(int i = 0; i < operators.size(); i++)
+					{
+						Operator op = (Operator)operators.elementAt(i);
+						if(op.name.contains("remove"))
+						{
+							operators.setElementAt((Operator)operators.elementAt(0),i);
+							operators.setElementAt(op, 0);
+						}
+					}
+				}
+			}
+
+			else if(goalToken[0].equals("clear"))
+			{
+				//目標がclearならremoveを選択
+				for(int i = 0;  i < operators.size(); i++)
+				{
+					Operator op = (Operator)operators.elementAt(i);
+					if(op.name.contains("remove"))
+					{
+						operators.setElementAt((Operator)operators.elementAt(0),i);
+						operators.setElementAt(op, 0);
+					}
+				}
+			}
+		}
+
+		else if(goalToken.length == 1 && goalToken[0].equals("handEmpty"))
+		{
+			//目標がhandEmptyならputを選択
+			for(int i = 0;  i < operators.size(); i++)
+			{
+				Operator op = (Operator)operators.elementAt(i);
+				if(op.name.contains("put"))
+				{
+					operators.removeElementAt(i);;
+					operators.addElement(op);
+				}
+			}
 		}
 	}
 }

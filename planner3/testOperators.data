@@ -1,0 +1,50 @@
+NAME    "Place ?x on ?y"
+IF  "clear ?y"
+    "holding ?x"
+     "not holding ?y"
+ADD "?x on ?y"
+    "clear ?x"
+    "handEmpty"
+     "not holding ?x"
+DELETE  "clear ?y"
+        "holding ?x"
+PRIORITY 3
+END
+
+NAME    "remove ?x from on top ?y"
+IF  "?x on ?y"
+    "clear ?x"
+    "handEmpty"
+    "not holding ?x"
+    "not holding ?y" 
+ADD "clear ?y"
+    "holding ?x"
+DELETE  "?x on ?y"
+        "clear ?x"
+        "handEmpty"
+        "not holding ?x"
+PRIORITY 1
+END
+
+NAME    "pick up ?x from the table"
+IF  "ontable ?x"
+    "clear ?x"
+    "handEmpty"
+    "not holding ?x"
+ADD "holding ?x"
+DELETE  "ontable ?x"
+        "clear ?x"
+        "handEmpty"
+        "not holding ?x"
+PRIORITY 2
+END
+
+NAME    "put ?x down on the table"
+IF  "holding ?x"
+ADD "ontable ?x"
+    "clear ?x"
+    "handEmpty"
+    "not holding ?x"
+DELETE  "holding ?x"
+PRIORITY 1
+END
