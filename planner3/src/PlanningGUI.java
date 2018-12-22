@@ -179,17 +179,23 @@ public class PlanningGUI extends JFrame implements Runnable
 
     @Override public void paint(Graphics g)
     {
-
         Dimension size = getSize();
         Image back = createImage(size.width,size.height);
-
         Graphics buffer = back.getGraphics();
 
         super.paint(buffer);
+
         buffer.drawLine(0,100,1280,100);
 
         field.draw(buffer);
 
         g.drawImage(back,0,0,this);
+        
+
+        /*
+        super.paint(g);
+        g.drawLine(0,100,1280,100);
+        field.draw(g);
+        */
     }
 }
