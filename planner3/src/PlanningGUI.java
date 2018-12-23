@@ -181,16 +181,26 @@ public class PlanningGUI extends JFrame implements Runnable
     {
         Dimension size = getSize();
         Image back = createImage(size.width,size.height);
-        Graphics buffer = back.getGraphics();
+        Graphics2D buffer = (Graphics2D)back.getGraphics();
+        buffer.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
+        buffer.drawString("hoge:HRGB",100,100);
+        buffer.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HBGR);
+        buffer.drawString("hoge:HBGR",100,130);
+        buffer.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_VRGB);
+        buffer.drawString("hoge:VRGB",100,160);
+        buffer.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_VBGR);
+        buffer.drawString("hoge:VBGR",100,190);
+        //super.paint(buffer);
 
-        super.paint(buffer);
+        //buffer.drawLine(0,100,1280,100);
 
-        buffer.drawLine(0,100,1280,100);
+        //field.draw(buffer);
 
-        field.draw(buffer);
+      
 
         g.drawImage(back,0,0,this);
-        
+
+        //g.drawString("hoge2",200,100);
 
         /*
         super.paint(g);
